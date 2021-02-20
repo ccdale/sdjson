@@ -34,7 +34,7 @@ sd = SDApi(
     debug=True,
 )
 
-sd.apiStatus()
+sd.apiOnline()
 msg = "OK" if sd.online else "NOK"
 print(f"{msg}: {sd.statusmsg}")
 if cfg["token"] != sd.token:

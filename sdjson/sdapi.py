@@ -189,15 +189,15 @@ class SDApi:
             print(msg)
             raise
 
-    def apiStatus(self):
+    def apiOnline(self):
         """Set the status of the SD API"""
         try:
 
             @self.apiTokenRequired
-            def sdapiStatus():
+            def sdapiOnline():
                 return self.apiGet("status")
 
-            xstatus = sdapiStatus()
+            xstatus = sdapiOnline()
             self.parseLatestStatus(xstatus)
         except Exception as e:
             exci = sys.exc_info()[2]
