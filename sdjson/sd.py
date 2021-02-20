@@ -35,7 +35,7 @@ sd = SDApi(
 )
 
 sd.apiStatus()
-msg = "OK" if sd.status else "NOK"
+msg = "OK" if sd.online else "NOK"
 print(f"{msg}: {sd.statusmsg}")
 if cfg["token"] != sd.token:
     cfg["token"] = sd.token

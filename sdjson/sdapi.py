@@ -64,7 +64,7 @@ class SDApi:
             self.headers = {"User-Agent": f"{appname} / {__version__}"}
             self.token = token
             self.tokenexpires = tokenexpires
-            self.status = True
+            self.online = True
             self.statusmsg = "initialising"
         except Exception as e:
             exci = sys.exc_info()[2]
@@ -219,9 +219,9 @@ class SDApi:
                     if pdt > latest:
                         latest = pdt
                         if xst["status"] == "Online":
-                            self.status = True
+                            self.online = True
                         else:
-                            self.status = False
+                            self.online = False
                         self.statusmsg = xst["message"]
         except Exception as e:
             exci = sys.exc_info()[2]
