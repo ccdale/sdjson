@@ -15,7 +15,12 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with ccasdtv.  If not, see <http://www.gnu.org/licenses/>.
-"""ScheduleDirect API class for the ccasdtv application."""
+"""ScheduleDirect API class for the ccasdtv application.
+
+Mainly coding ideas from https://github.com/essandess/sd-py
+re-written in my coding style, with added token caching/renewing
+Thankyou Steven T. Smith.
+"""
 
 import datetime
 import json
