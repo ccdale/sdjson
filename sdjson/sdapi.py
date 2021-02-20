@@ -38,6 +38,8 @@ class SDApi:
         appname="ccasdtv",
         url="https://w8xmzqba6c.execute-api.us-east-1.amazonaws.com/20191022",
         debug=False,
+        token=None,
+        tokenexpires=0,
     ):
         """Initialise the SDApi Class.
 
@@ -54,7 +56,8 @@ class SDApi:
             self.url = url
             self.debug = debug
             self.headers = {"User-Agent": f"{appname} / {__version__}"}
-            self.token = None
+            self.token = token
+            self.tokenexpires = tokenexpires
             self.status = True
             self.statusmsg = "initialising"
         except Exception as e:
@@ -186,10 +189,6 @@ class SDApi:
                 return self.apiGet("status")
 
             xstatus = sdapiStatus()
-            print("\n")
-            print("xstatus follows")
-            print(xstatus)
-            print("\n")
             self.parseLatestStatus(xstatus)
         except Exception as e:
             exci = sys.exc_info()[2]
