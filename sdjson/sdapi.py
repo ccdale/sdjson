@@ -20,6 +20,7 @@
 import datetime
 import json
 import sys
+import time
 
 import requests
 
@@ -114,7 +115,7 @@ class SDApi:
         """Set the "token" header, call the api then remove the header."""
 
         def callFunc(*args, **kwargs):
-            if not self.token:
+            if not self.token or self.tokenexpires < time.time():
                 self.apiToken()
             self.headers["token"] = self.token
 
@@ -165,6 +166,9 @@ class SDApi:
             code = int(jres["code"])
             if code == 0:
                 self.token = jres["token"]
+                self.tokenexpires = datetime.datetime.strptime(
+                    jres["datetime"], "%Y-%m-%dT%H:%M:%SZ"
+                ).timestamp() + (3600 * 23)
                 if self.debug:
                     print("Token obtained")
             else:
