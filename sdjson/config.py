@@ -42,7 +42,7 @@ def writeConfig(config, appname="ccasdtv"):
 def readConfig(appname="ccasdtv"):
     try:
         config = {}
-        yamlfn = "tvh.yaml"
+        yamlfn = f"{appname}.yaml"
         home = Path.home()
         configfn = home.joinpath(".config", yamlfn)
         with open(str(configfn), "r") as cfn:
