@@ -155,9 +155,15 @@ class SDApi:
             res = self.apiPost("token", reqdata)
             res.raise_for_status()
             jres = res.json()
-            self.token = jres["token"]
-            if self.debug:
-                print("Token obtained")
+            code = int(jres["code"])
+            if code == 0:
+                self.token = jres["token"]
+                if self.debug:
+                    print("Token obtained")
+            else:
+                msg = f"code: {code}: "
+                msg += f"""jres["response"]"""
+                raise Exception(msg)
         except Exception as e:
             exci = sys.exc_info()[2]
             lineno = exci.tb_lineno
