@@ -121,6 +121,7 @@ class SDApi:
 
             jresp = callAPI()
             del self.headers["token"]
+            return jresp
 
         return callFunc
 
@@ -185,6 +186,10 @@ class SDApi:
                 return self.apiGet("status")
 
             xstatus = sdapiStatus()
+            print("\n")
+            print("xstatus follows")
+            print(xstatus)
+            print("\n")
             self.parseLatestStatus(xstatus)
         except Exception as e:
             exci = sys.exc_info()[2]
