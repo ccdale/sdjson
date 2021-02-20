@@ -205,7 +205,7 @@ class SDApi:
             if "systemStatus" in xstatus:
                 latest = 0
                 for xst in xstatus["systemStatus"]:
-                    pdt = datetime.strptime(
+                    pdt = datetime.datetime.strptime(
                         xst["date"], "%Y-%m-%dT%H:%M:%SZ"
                     ).timestamp()
                     if pdt > latest:
