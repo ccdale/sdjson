@@ -1,12 +1,15 @@
 """Database class for the ccasdtv application."""
 
 import sqlite3
+from pathlib import Path
 
 
 class SDDb:
-    def __init__(self, dbfilename):
+    def __init__(self, appname="ccasdtv"):
         try:
-            self.dbpath = dbfilename
+            dbfn = f"{appname}.db"
+            home = Path.home()
+            self.dbpath = home.joinpath(".config", dbfn)
         except Exception as e:
             exci = sys.exc_info()[2]
             lineno = exci.tb_lineno
