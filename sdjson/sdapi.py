@@ -17,6 +17,7 @@
 #     along with ccasdtv.  If not, see <http://www.gnu.org/licenses/>.
 """ScheduleDirect API class for the ccasdtv application."""
 
+import datetime
 import json
 import sys
 
@@ -54,6 +55,8 @@ class SDApi:
             self.debug = debug
             self.headers = {"User-Agent": f"{appname} / {__version__}"}
             self.token = None
+            self.status = True
+            self.statusmsg = "initialising"
         except Exception as e:
             exci = sys.exc_info()[2]
             lineno = exci.tb_lineno
@@ -174,14 +177,39 @@ class SDApi:
             raise
 
     def apiStatus(self):
-        """Return the status of the SD API"""
+        """Set the status of the SD API"""
         try:
 
             @self.apiTokenRequired
             def sdapiStatus():
                 return self.apiGet("status")
 
-            return sdapiStatus()
+            xstatus = sdapiStatus()
+            self.parseLatestStatus(xstatus)
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            print(msg)
+            raise
+
+    def parseLatestStatus(self, xstatus):
+        try:
+            if "systemStatus" in xstatus:
+                latest = 0
+                for xst in xstatus["systemStatus"]:
+                    pdt = datetime.strptime(
+                        xst["date"], "%Y-%m-%dT%H:%M:%SZ"
+                    ).timestamp()
+                    if pdt > latest:
+                        latest = pdt
+                        if xst["status"] == "Online":
+                            self.status = True
+                        else:
+                            self.status = False
+                        self.statusmsg = xst["message"]
         except Exception as e:
             exci = sys.exc_info()[2]
             lineno = exci.tb_lineno
