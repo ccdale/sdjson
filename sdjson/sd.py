@@ -2,11 +2,13 @@
 
 import hashlib
 import json
+import sys
 
 import requests
 
 from sdjson.config import readConfig
 from sdjson.config import writeConfig
+from sdjson.db import SDDb
 from sdjson.sdapi import SDApi
 from sdjson import __version__
 
@@ -35,8 +37,17 @@ sd = SDApi(
 )
 
 sd.apiOnline()
-msg = "OK" if sd.online else "NOK"
-print(f"{msg}: {sd.statusmsg}")
+print(sd.statusmsg)
+if not sd.online:
+    sys.exit(1)
+
+
+avail = sd.available()
+
+# Sandy Heath Transmitter
+prv = sd.preview("GBR-1000073-DEFAULT")
+
+
 if cfg["token"] != sd.token:
     cfg["token"] = sd.token
     cfg["tokenexpires"] = sd.tokenexpires

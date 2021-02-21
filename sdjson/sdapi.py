@@ -55,6 +55,8 @@ class SDApi:
             appname: str: Name that is used as the User-Agent header
             url: str: SD API URL - default is the beta 20191022 url
             debug: bool: print api calls and responses
+            token: str: cached token from previous runs, default: None
+            tokenexpires: float: timestamp for when the cached token expires, default: 0
         """
         try:
             self.username = username
@@ -75,9 +77,10 @@ class SDApi:
             print(msg)
             raise
 
-    def showResponse(self, jresp):
+    def showResponse(self, jresp, force=False):
+        """Pretty print json responses."""
         try:
-            if self.debug:
+            if self.debug or force:
                 print(
                     json.dumps(jresp, indent=4, sort_keys=True), end="\n\n", flush=True
                 )
@@ -135,6 +138,7 @@ class SDApi:
         return callFunc
 
     def apiPost(self, route, postdict):
+        """Post data to the SD API."""
         try:
             url = f"{self.url}/{route}"
             return requests.post(url, headers=self.headers, data=json.dumps(postdict))
@@ -148,6 +152,7 @@ class SDApi:
             raise
 
     def apiGet(self, route, querydict={}):
+        """Get data from the SD API."""
         try:
             url = f"{self.url}/{route}"
             return requests.get(url, headers=self.headers, params=querydict)
@@ -161,6 +166,7 @@ class SDApi:
             raise
 
     def apiToken(self):
+        """Obtain an API Token."""
         try:
             if self.debug:
                 print("Asking for a token")
@@ -190,7 +196,7 @@ class SDApi:
             raise
 
     def apiOnline(self):
-        """Set the status of the SD API"""
+        """Obtain the status of the SD API"""
         try:
 
             @self.apiTokenRequired
@@ -209,6 +215,7 @@ class SDApi:
             raise
 
     def parseLatestStatus(self, xstatus):
+        """Find and parse the latest status message from the SD API."""
         try:
             if "systemStatus" in xstatus:
                 latest = 0
@@ -223,6 +230,61 @@ class SDApi:
                         else:
                             self.online = False
                         self.statusmsg = xst["message"]
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            print(msg)
+            raise
+
+    def available(self):
+        """Retrieve the list of Services available from SD."""
+        try:
+
+            @self.apiNoToken
+            def sdavailable():
+                return self.apiGet("available")
+
+            return sdavailable()
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            print(msg)
+            raise
+
+    def lineups(self, countrycode, postcode):
+        """Retrieve the lineups available for the country/postcode combo."""
+        try:
+            qs = {"country": countrycode, "postalcode": postcode}
+
+            @self.apiTokenRequired
+            def sdlineups():
+                return self.apiGet("lineups", querydict=qs)
+
+            return sdlineups()
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            print(msg)
+            raise
+
+    def preview(self, lineupcode):
+        """Preview a lineup to determine the channel/station mapping."""
+        try:
+
+            @self.apiTokenRequired
+            def sdpreview():
+                return self.apiGet(f"lineups/preview/{lineupcode}")
+
+            return sdpreview()
         except Exception as e:
             exci = sys.exc_info()[2]
             lineno = exci.tb_lineno

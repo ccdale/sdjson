@@ -1,0 +1,96 @@
+#
+# Copyright (c) 2021, Christopher Allison
+#
+#     This file is part of ccasdtv.
+#
+#     ccasdtv is free software: you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation, either version 3 of the License, or
+#     (at your option) any later version.
+#
+#     ccasdtv is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with ccasdtv.  If not, see <http://www.gnu.org/licenses/>.
+"""Cache functions for ccasdtv."""
+
+from pathlib import Path
+import sys
+
+
+def getCacheDir(appname="ccasdtv"):
+    try:
+        home = Path.home()
+        cachedir = home.joinpath(f".{appname}")
+        return cachedir
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        print(msg)
+        raise
+
+
+def getDescendingDir(name):
+    """Make a path like string of the 1st 4 chars of name."""
+    try:
+        # name is the md5 sum of the program data
+        # use the 1st 4 characters of the name to make descending
+        # directories for the cache.
+        hold = ""
+        tree = []
+        for i in range(4):
+            hold += name[i]
+            tree.append(hold)
+        return "/".join(tree)
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        print(msg)
+        raise
+
+
+def makeCacheDir(name, dtype="program", appname="ccasdtv"):
+    try:
+        home = Path.home()
+        cachedir = getCacheDir(appname)
+        if dtype == "cache":
+            home.mkdir(cachedir, parents=True, exist_ok=True)
+        elif dtype == "channel":
+            chandir = home.joinpath(cachedir, "channel", name)
+            home.mkdir(chandir, parents=True, exist_ok=True)
+        elif dtype == "program":
+            pdir = home.joinpath(cachedir, "programs", getDescendingDir(name))
+            home.mkdir(pdir, parents=True, exist_ok=True)
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        print(msg)
+        raise
+
+
+def makeCache(appname="ccasdtv"):
+    """Makes the cache directory for the ccasdtv application."""
+    try:
+        cachedir = getCacheDir(appname)
+        home.mkdir(cachedir, parents=True, exist_ok=True)
+        return cachedir
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        print(msg)
+        raise
