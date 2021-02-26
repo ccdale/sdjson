@@ -68,7 +68,7 @@ def makeCacheDir(name, dtype="program", appname="ccasdtv"):
             chandir = home.joinpath(cachedir, "channel", name)
             home.mkdir(chandir, parents=True, exist_ok=True)
         elif dtype == "program":
-            pdir = home.joinpath(cachedir, "programs", getDescendingDir(name))
+            pdir = home.joinpath(cachedir, "program", getDescendingDir(name))
             home.mkdir(pdir, parents=True, exist_ok=True)
     except Exception as e:
         exci = sys.exc_info()[2]
