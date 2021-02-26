@@ -327,6 +327,7 @@ class SDApi:
             raise
 
     def putLineup(self, lineupcode):
+        """Put the users lineup into their SD account."""
         try:
 
             @self.apiTokenRequired
