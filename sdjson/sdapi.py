@@ -293,3 +293,21 @@ class SDApi:
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
             print(msg)
             raise
+
+    def getLineup(self, lineupcode):
+        """Retrieve the map of channel to stationid for the lineup."""
+        try:
+
+            @self.apiTokenRequired
+            def sdgetlineup():
+                return self.apiGet(f"lineups/{lineupcode}")
+
+            return sdgetlineup()
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            print(msg)
+            raise
