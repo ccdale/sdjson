@@ -59,6 +59,7 @@ def getDescendingDir(name):
 
 
 def makeCacheDir(name, dtype="program", appname="ccasdtv"):
+    """Makes the cache directories for the ccasdtv application."""
     try:
         home = Path.home()
         cachedir = getCacheDir(appname)
@@ -70,22 +71,6 @@ def makeCacheDir(name, dtype="program", appname="ccasdtv"):
         elif dtype == "program":
             pdir = home.joinpath(cachedir, "program", getDescendingDir(name))
             home.mkdir(pdir, parents=True, exist_ok=True)
-    except Exception as e:
-        exci = sys.exc_info()[2]
-        lineno = exci.tb_lineno
-        fname = exci.tb_frame.f_code.co_name
-        ename = type(e).__name__
-        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-        print(msg)
-        raise
-
-
-def makeCache(appname="ccasdtv"):
-    """Makes the cache directory for the ccasdtv application."""
-    try:
-        cachedir = getCacheDir(appname)
-        home.mkdir(cachedir, parents=True, exist_ok=True)
-        return cachedir
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
