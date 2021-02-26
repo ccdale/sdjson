@@ -45,8 +45,9 @@ def readConfig(appname="ccasdtv"):
         yamlfn = f"{appname}.yaml"
         home = Path.home()
         configfn = home.joinpath(".config", yamlfn)
-        with open(str(configfn), "r") as cfn:
-            config = yaml.safe_load(cfn)
+        if configfn.exists():
+            with open(str(configfn), "r") as cfn:
+                config = yaml.safe_load(cfn)
         return config
     except Exception as e:
         exci = sys.exc_info()[2]
