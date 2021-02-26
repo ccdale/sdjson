@@ -165,6 +165,20 @@ class SDApi:
             print(msg)
             raise
 
+    def apiPut(self, route, querydict={}):
+        """Put data to the SD API."""
+        try:
+            url = f"{self.url}/{route}"
+            return requests.put(url, headers=self.headers, params=querydict)
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            print(msg)
+            raise
+
     def apiToken(self):
         """Obtain an API Token."""
         try:
@@ -303,6 +317,23 @@ class SDApi:
                 return self.apiGet(f"lineups/{lineupcode}")
 
             return sdgetlineup()
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            print(msg)
+            raise
+
+    def putLineup(self, lineupcode):
+        try:
+
+            @self.apiTokenRequired
+            def sdputlineup():
+                return self.apiPut(f"lineups/{lineupcode}")
+
+            return sdputlineup()
         except Exception as e:
             exci = sys.exc_info()[2]
             lineno = exci.tb_lineno
