@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sdjson"
-version = "0.1.12"
+version = "0.1.13"
 description = "reads schedules direct for tvlistings"
 authors = ["ccdale <chris.charles.allison+sdjson@gmail.com>"]
 license = "GPL-3.0-or-later"
@@ -9,6 +9,8 @@ license = "GPL-3.0-or-later"
 python = "^3.7"
 requests = "^2.25.1"
 pyaml = "^20.4.0"
+click = "^7.1.2"
+ccalogging = "^0.3.3"
 
 [tool.poetry.dev-dependencies]
 
