@@ -24,11 +24,16 @@ import yaml
 
 def writeConfig(config, appname="ccasdtv"):
     try:
-        yamlfn = f"{appname}.yaml"
-        home = Path.home()
-        configfn = home.joinpath(".config", yamlfn)
-        with open(str(configfn), "w") as cfn:
-            yaml.dump(config, cfn, default_flow_style=False)
+        amdirty = True
+        if "amdirty" in config:
+            amdirty = config["amdirty"]
+            del config["amdirty"]
+        if amdirty:
+            yamlfn = f"{appname}.yaml"
+            home = Path.home()
+            configfn = home.joinpath(".config", yamlfn)
+            with open(str(configfn), "w") as cfn:
+                yaml.dump(config, cfn, default_flow_style=False)
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
