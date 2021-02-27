@@ -21,6 +21,10 @@ from pathlib import Path
 import sys
 import yaml
 
+import ccalogging
+
+log = ccalogging.log
+
 
 def writeConfig(config, appname="ccasdtv"):
     try:
@@ -29,6 +33,7 @@ def writeConfig(config, appname="ccasdtv"):
             amdirty = config["amdirty"]
             del config["amdirty"]
         if amdirty:
+            log.info("writing config")
             yamlfn = f"{appname}.yaml"
             home = Path.home()
             configfn = home.joinpath(".config", yamlfn)
@@ -40,7 +45,8 @@ def writeConfig(config, appname="ccasdtv"):
         fname = exci.tb_frame.f_code.co_name
         ename = type(e).__name__
         msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-        print(msg)
+        log.error(msg)
+        # print(msg)
         raise
 
 
@@ -50,7 +56,9 @@ def readConfig(appname="ccasdtv"):
         yamlfn = f"{appname}.yaml"
         home = Path.home()
         configfn = home.joinpath(".config", yamlfn)
+        log.debug(f"config file: {configfn}")
         if configfn.exists():
+            log.debug(f"reading config file {configfn}")
             with open(str(configfn), "r") as cfn:
                 config = yaml.safe_load(cfn)
         return config
@@ -60,5 +68,6 @@ def readConfig(appname="ccasdtv"):
         fname = exci.tb_frame.f_code.co_name
         ename = type(e).__name__
         msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-        print(msg)
+        log.error(msg)
+        # print(msg)
         raise
