@@ -17,12 +17,15 @@
 #     along with ccasdtv.  If not, see <http://www.gnu.org/licenses/>.
 """Cache functions for ccasdtv."""
 
+import json
 from pathlib import Path
 import sys
 
 import ccalogging
 
 log = ccalogging.log
+
+cachedict = None
 
 
 def getCacheDir(appname="ccasdtv"):
@@ -62,21 +65,24 @@ def getDescendingDir(name):
         raise
 
 
-def makeCacheDir(name, dtype="program", appname="ccasdtv"):
+def makeCacheDir(name=None, dtype="program", appname="ccasdtv"):
     """Makes the cache directories for the ccasdtv application."""
     try:
         home = Path.home()
         cachedir = getCacheDir(appname)
         if dtype == "cache":
-            home.mkdir(cachedir, parents=True, exist_ok=True)
+            cachedir.mkdir(parents=True, exist_ok=True)
             return cachedir
         elif dtype == "channel":
-            chandir = home.joinpath(cachedir, "channel", name)
-            home.mkdir(chandir, parents=True, exist_ok=True)
+            chandir = cachedir.joinpath("channel", name)
+            chandir.mkdir(parents=True, exist_ok=True)
             return chandir
         elif dtype == "program":
-            pdir = home.joinpath(cachedir, "program", getDescendingDir(name))
-            home.mkdir(pdir, parents=True, exist_ok=True)
+            if name is not None:
+                pdir = cachedir.joinpath("program", getDescendingDir(name))
+            else:
+                pdir = cachedir.joinpath("program")
+            pdir.mkdir(parents=True, exist_ok=True)
             return pdir
     except Exception as e:
         exci = sys.exc_info()[2]
@@ -92,14 +98,28 @@ def setupCache(appname="ccasdtv"):
     """Sets up the cache directories for the ccasdtv application."""
     try:
         cachedict = {}
-        cachedict["cachedir"] = makeCacheDir("cache", dtype="cache", appname=appname)
-        cachedict["chandir"] = makeCacheDir(
-            "channels", dtype="channel", appname=appname
-        )
-        cachedict["progdir"] = makeCacheDir(
-            "programs", dtype="program", appname=appname
-        )
-        return cachedict
+        cachedict["cachedir"] = makeCacheDir(dtype="cache", appname=appname)
+        cachedict["chandir"] = makeCacheDir(dtype="channel", appname=appname)
+        cachedict["progdir"] = makeCacheDir(dtype="program", appname=appname)
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def writeChannelToCache(chandata):
+    try:
+        if cachedict is None:
+            setupCache()
+        xdir = cachedict["channels"].joinpath(chandata["stationID"])
+        xdir.mkdir(exist_ok=True)
+        channelfilename = xdir.joinpath(f"""{chandata["stationID"]}.json""")
+        with open(channelfilename, "w") as cfn:
+            json.dump(chandata, cfn, seperators=(",", ":"))
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
