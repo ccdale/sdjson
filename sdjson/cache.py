@@ -111,15 +111,45 @@ def setupCache(appname="ccasdtv"):
         raise
 
 
-def writeChannelToCache(chandata):
+def setupChannelDir(stationid):
     try:
         if cachedict is None:
             setupCache()
-        xdir = cachedict["channels"].joinpath(chandata["stationID"])
+        xdir = cachedict["channels"].joinpath(stationid)
         xdir.mkdir(exist_ok=True)
+        return xdir
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def writeChannelToCache(chandata):
+    try:
+        xdir = setupChannelDir(chandata["stationID"])
         channelfilename = xdir.joinpath(f"""{chandata["stationID"]}.json""")
         with open(channelfilename, "w") as cfn:
             json.dump(chandata, cfn, seperators=(",", ":"))
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def writeChannelScheduleToCache(chansched):
+    try:
+        xdir = setupChannelDir(chandata["stationID"])
+        schedfilename = xdir.joinpath("schedule.json")
+        with open(schedfilename, "w") as cfn:
+            json.dump(chansched, cfn, seperators=(",", ":"))
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
