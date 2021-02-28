@@ -297,7 +297,7 @@ class SDApi:
             log.error(msg)
             raise
 
-    def getlineups(self, countrycode, postcode):
+    def getLineups(self, countrycode, postcode):
         """Retrieve the lineups available for the country/postcode combo."""
         try:
             qs = {"country": countrycode, "postalcode": postcode}
