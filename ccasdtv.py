@@ -8,6 +8,8 @@ import sys
 import ccalogging
 import click
 
+from sdjson.cache import cachedict
+from sdjson.cache import setupCache
 from sdjson.cache import writeChannelToCache
 import sdjson.config as CFG
 from sdjson.lineup import parseLineupData
@@ -115,6 +117,8 @@ def getSchedules():
         cfg = CFG.readConfig(**ckwargs)
         cfg["amdirty"] = False
         sd = setupSD(cfg)
+        if cachedict is None:
+            setupCache(appname=appname)
         if sd.lineups is not None:
             for lineup in sd.lineups:
                 ljson = sd.getLineup(lineup["lineupID"])
