@@ -82,6 +82,7 @@ def doConfigure():
 
 def setupSD(cfg):
     try:
+        kwargs = {"appname": appname}
         keymap = {"password": "sha1password"}
         keys = ["username", "password", "url", "token", "tokenexpires"]
         for key in keys:
@@ -123,4 +124,4 @@ def getSchedules():
 
 
 if __name__ == "__main__":
-    doConfigure()
+    getSchedules()
