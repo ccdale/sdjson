@@ -236,7 +236,9 @@ class SDApi:
             xstatus = sdapiOnline()
             self.parseLatestStatus(xstatus)
             state = "ONLINE" if self.online else "OFFLINE"
-            log.info(f"{state}: {self.statusmsg}")
+            log.debug(f"{state}: {self.statusmsg}")
+            if not self.online:
+                raise Exception(f"SD API is Offline: {sd.statusmsg}")
         except Exception as e:
             exci = sys.exc_info()[2]
             lineno = exci.tb_lineno
