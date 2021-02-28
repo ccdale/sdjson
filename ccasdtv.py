@@ -21,6 +21,8 @@ ccalogging.setLogFile(logfilename)
 ccalogging.setDebug()
 log = ccalogging.log
 
+# blank line to mark the beginning of a run in the log file
+log.info("")
 log.info(f"{appname} {__version__} CLI Starting")
 
 
