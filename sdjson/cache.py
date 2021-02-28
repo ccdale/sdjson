@@ -115,7 +115,7 @@ def setupChannelDir(stationid):
     try:
         if cachedict is None:
             setupCache()
-        xdir = cachedict["channels"].joinpath(stationid)
+        xdir = cachedict["chandir"].joinpath(stationid)
         xdir.mkdir(exist_ok=True)
         return xdir
     except Exception as e:
