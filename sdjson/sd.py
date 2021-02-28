@@ -33,19 +33,23 @@ sd = SDApi(
     appname=appname,
     token=token,
     tokenexpires=tokenexpires,
-    debug=True,
+    debug=False,
 )
 
 sd.apiOnline()
-print(sd.statusmsg)
 if not sd.online:
+    print(sd.statusmsg)
     sys.exit(1)
 
 
 avail = sd.available()
 
+res = sd.putLineup("GBR-1000073-DEFAULT")
+sd.showResponse(res, True)
 # Sandy Heath Transmitter
-prv = sd.preview("GBR-1000073-DEFAULT")
+# prv = sd.preview("GBR-1000073-DEFAULT")
+# lineupmap = sd.getLineup("GBR-1000073-DEFAULT")
+# sd.showResponse(lineupmap, True)
 
 
 if cfg["token"] != sd.token:
