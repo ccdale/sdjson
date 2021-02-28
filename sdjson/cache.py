@@ -144,9 +144,9 @@ def writeChannelToCache(chandata):
         raise
 
 
-def writeChannelScheduleToCache(chansched):
+def writeChannelScheduleToCache(stationid, chansched):
     try:
-        xdir = setupChannelDir(chandata["stationID"])
+        xdir = setupChannelDir(stationid)
         schedfilename = xdir.joinpath("schedule.json")
         with open(schedfilename, "w") as cfn:
             json.dump(chansched, cfn, seperators=(",", ":"))
