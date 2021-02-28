@@ -126,7 +126,6 @@ def getSchedules():
                 byid = channeldict["channelsbyid"]
                 for chan in byid:
                     writeChannelToCache(byid[chan])
-                    break
 
         CFG.writeConfig(cfg, **ckwargs)
     except Exception as e:
