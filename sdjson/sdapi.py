@@ -68,8 +68,9 @@ class SDApi:
             self.headers = {"User-Agent": f"{appname} / {__version__}"}
             self.token = token
             self.tokenexpires = tokenexpires
-            self.online = True
+            self.online = False
             self.statusmsg = "initialising"
+            self.lineups = None
             log.debug("SDApi initialising")
         except Exception as e:
             exci = sys.exc_info()[2]
@@ -239,6 +240,8 @@ class SDApi:
             log.debug(f"{state}: {self.statusmsg}")
             if not self.online:
                 raise Exception(f"SD API is Offline: {sd.statusmsg}")
+            if "lineups" in xstatus:
+                self.lineups = xstatus["lineups"]
         except Exception as e:
             exci = sys.exc_info()[2]
             lineno = exci.tb_lineno
@@ -294,7 +297,7 @@ class SDApi:
             log.error(msg)
             raise
 
-    def lineups(self, countrycode, postcode):
+    def getlineups(self, countrycode, postcode):
         """Retrieve the lineups available for the country/postcode combo."""
         try:
             qs = {"country": countrycode, "postalcode": postcode}
