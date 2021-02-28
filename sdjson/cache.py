@@ -78,8 +78,8 @@ def makeCacheDir(name=None, dtype="program", appname="ccasdtv"):
             cachedir.mkdir(parents=True, exist_ok=True)
             return cachedir
         elif dtype == "channel":
-            log.debug(f"making directory {chandir}")
             chandir = cachedir.joinpath("channel")
+            log.debug(f"making directory {chandir}")
             chandir.mkdir(parents=True, exist_ok=True)
             return chandir
         elif dtype == "program":
