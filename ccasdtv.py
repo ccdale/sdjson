@@ -16,7 +16,7 @@ from sdjson import __version__
 appname = "ccasdtv"
 home = Path.home()
 
-logfilename = home.joinpath(f"{appname}.log")
+logfilename = home.joinpath(f".{appname}.log")
 ccalogging.setLogFile(logfilename)
 ccalogging.setDebug()
 log = ccalogging.log
