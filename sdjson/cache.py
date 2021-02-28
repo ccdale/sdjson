@@ -136,7 +136,7 @@ def writeChannelToCache(chandata):
         xdir = setupChannelDir(chandata["stationID"])
         channelfilename = xdir.joinpath(f"""{chandata["stationID"]}.json""")
         with open(channelfilename, "w") as cfn:
-            json.dump(chandata, cfn, seperators=(",", ":"))
+            json.dump(chandata, cfn, separators=(",", ":"))
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
@@ -152,7 +152,7 @@ def writeChannelScheduleToCache(stationid, chansched):
         xdir = setupChannelDir(stationid)
         schedfilename = xdir.joinpath("schedule.json")
         with open(schedfilename, "w") as cfn:
-            json.dump(chansched, cfn, seperators=(",", ":"))
+            json.dump(chansched, cfn, separators=(",", ":"))
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
