@@ -32,6 +32,7 @@ def getCacheDir(appname="ccasdtv"):
     try:
         home = Path.home()
         cachedir = home.joinpath(f".{appname}")
+        log.debug(f"setting cache directory to be: {cachedir}")
         return cachedir
     except Exception as e:
         exci = sys.exc_info()[2]
@@ -54,7 +55,9 @@ def getDescendingDir(name):
         for i in range(4):
             hold += name[i]
             tree.append(hold)
-        return "/".join(tree)
+        xs = "/".join(tree)
+        log.debug(f"built path {xs}")
+        return xs
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
@@ -71,9 +74,11 @@ def makeCacheDir(name=None, dtype="program", appname="ccasdtv"):
         home = Path.home()
         cachedir = getCacheDir(appname)
         if dtype == "cache":
+            log.debug(f"making directory {cachedir}")
             cachedir.mkdir(parents=True, exist_ok=True)
             return cachedir
         elif dtype == "channel":
+            log.debug(f"making directory {chandir}")
             chandir = cachedir.joinpath("channel")
             chandir.mkdir(parents=True, exist_ok=True)
             return chandir
@@ -82,6 +87,7 @@ def makeCacheDir(name=None, dtype="program", appname="ccasdtv"):
                 pdir = cachedir.joinpath("program", getDescendingDir(name))
             else:
                 pdir = cachedir.joinpath("program")
+            log.debug(f"making directory {pdir}")
             pdir.mkdir(parents=True, exist_ok=True)
             return pdir
     except Exception as e:
@@ -98,6 +104,7 @@ def setupCache(appname="ccasdtv"):
     """Sets up the cache directories for the ccasdtv application."""
     try:
         global cachedict
+        log.debug("Setting up cache locations")
         cachedict = {}
         cachedict["cachedir"] = makeCacheDir(dtype="cache", appname=appname)
         cachedict["chandir"] = makeCacheDir(dtype="channel", appname=appname)
@@ -118,6 +125,7 @@ def setupChannelDir(stationid):
         if cachedict is None:
             raise Exception("Cache dictionary has not been setup")
         xdir = cachedict["chandir"].joinpath(stationid)
+        log.debug(f"creating directory {xdir}")
         xdir.mkdir(exist_ok=True)
         return xdir
     except Exception as e:
@@ -132,9 +140,9 @@ def setupChannelDir(stationid):
 
 def writeChannelToCache(chandata):
     try:
-        print(chandata)
         xdir = setupChannelDir(chandata["stationID"])
         channelfilename = xdir.joinpath(f"""{chandata["stationID"]}.json""")
+        log.debug(f"saving channel data to {channelfilename}")
         with open(channelfilename, "w") as cfn:
             json.dump(chandata, cfn, separators=(",", ":"))
     except Exception as e:
@@ -151,6 +159,7 @@ def writeChannelScheduleToCache(stationid, chansched):
     try:
         xdir = setupChannelDir(stationid)
         schedfilename = xdir.joinpath("schedule.json")
+        log.debug(f"writing schedule data to {schedfilename}")
         with open(schedfilename, "w") as cfn:
             json.dump(chansched, cfn, separators=(",", ":"))
     except Exception as e:
