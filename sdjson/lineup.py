@@ -28,7 +28,7 @@ def parseStations(sdata, channums):
     try:
         channelsbyname = {}
         channelsbyid = {}
-        for station in stations:
+        for station in sdata:
             station["channelnumber"] = channums[station["stationID"]]
             channelsbyname[station["name"]] = station
             channelsbyid[station["stationID"]] = station
