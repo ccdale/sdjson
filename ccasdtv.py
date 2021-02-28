@@ -8,8 +8,9 @@ import sys
 import ccalogging
 import click
 
-from sdjson.cache import makeCacheDir
+from sdjson.cache import writeChannelToCache
 import sdjson.config as CFG
+from sdjson.lineup import parseLineupData
 from sdjson.sdapi import SDApi
 from sdjson import __version__
 
@@ -114,6 +115,13 @@ def getSchedules():
         cfg = CFG.readConfig(**ckwargs)
         cfg["amdirty"] = False
         sd = setupSD(cfg)
+        if sd.lineups is not None:
+            for lineup in sd.lineups:
+                ljson = sd.getLineup(lineup["lineupID"])
+                channeldict = parseLineupData(ljson)
+                for chan in channeldict["channelsbyid"]:
+                    writeChannelToCache(chan)
+                    break
 
         CFG.writeConfig(cfg, **ckwargs)
     except Exception as e:
