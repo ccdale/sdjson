@@ -97,6 +97,7 @@ def makeCacheDir(name=None, dtype="program", appname="ccasdtv"):
 def setupCache(appname="ccasdtv"):
     """Sets up the cache directories for the ccasdtv application."""
     try:
+        global cachedict
         cachedict = {}
         cachedict["cachedir"] = makeCacheDir(dtype="cache", appname=appname)
         cachedict["chandir"] = makeCacheDir(dtype="channel", appname=appname)
@@ -113,6 +114,7 @@ def setupCache(appname="ccasdtv"):
 
 def setupChannelDir(stationid):
     try:
+        global cachedict
         if cachedict is None:
             raise Exception("Cache dictionary has not been setup")
         xdir = cachedict["chandir"].joinpath(stationid)
