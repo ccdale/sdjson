@@ -119,8 +119,9 @@ def getSchedules():
             for lineup in sd.lineups:
                 ljson = sd.getLineup(lineup["lineupID"])
                 channeldict = parseLineupData(ljson)
-                for chan in channeldict["channelsbyid"]:
-                    writeChannelToCache(chan)
+                byid = channeldict["channelsbyid"]
+                for chan in byid:
+                    writeChannelToCache(byid[chan])
                     break
 
         CFG.writeConfig(cfg, **ckwargs)

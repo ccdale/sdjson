@@ -74,7 +74,7 @@ def makeCacheDir(name=None, dtype="program", appname="ccasdtv"):
             cachedir.mkdir(parents=True, exist_ok=True)
             return cachedir
         elif dtype == "channel":
-            chandir = cachedir.joinpath("channel", name)
+            chandir = cachedir.joinpath("channel")
             chandir.mkdir(parents=True, exist_ok=True)
             return chandir
         elif dtype == "program":
@@ -130,6 +130,7 @@ def setupChannelDir(stationid):
 
 def writeChannelToCache(chandata):
     try:
+        print(chandata)
         xdir = setupChannelDir(chandata["stationID"])
         channelfilename = xdir.joinpath(f"""{chandata["stationID"]}.json""")
         with open(channelfilename, "w") as cfn:
