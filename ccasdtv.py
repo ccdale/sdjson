@@ -108,10 +108,12 @@ def setupSD(cfg):
 
 def getSchedules():
     try:
-        kwargs = {"appname": appname}
-        cfg = CFG.readConfig(**kwargs)
+        ckwargs = {"appname": appname}
+        cfg = CFG.readConfig(**ckwargs)
         cfg["amdirty"] = False
         sd = setupSD(cfg)
+
+        CFG.writeConfig(cfg, **ckwargs)
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
