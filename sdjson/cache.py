@@ -114,7 +114,7 @@ def setupCache(appname="ccasdtv"):
 def setupChannelDir(stationid):
     try:
         if cachedict is None:
-            setupCache()
+            raise Exception("Cache dictionary has not been setup")
         xdir = cachedict["chandir"].joinpath(stationid)
         xdir.mkdir(exist_ok=True)
         return xdir
