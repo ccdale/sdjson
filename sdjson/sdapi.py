@@ -27,10 +27,12 @@ import json
 import sys
 import time
 
+import ccalogging
 import requests
 
 from sdjson import __version__
 
+log = ccalogging.log
 
 # when the 20191022 api is out of beta the default url should be:
 # https://json.schedulesdirect.org/20191022
@@ -68,13 +70,15 @@ class SDApi:
             self.tokenexpires = tokenexpires
             self.online = True
             self.statusmsg = "initialising"
+            log.debug("SDApi initialising")
         except Exception as e:
             exci = sys.exc_info()[2]
             lineno = exci.tb_lineno
             fname = exci.tb_frame.f_code.co_name
             ename = type(e).__name__
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-            print(msg)
+            # print(msg)
+            log.error(msg)
             raise
 
     def showResponse(self, jresp, force=False):
@@ -90,7 +94,8 @@ class SDApi:
             fname = exci.tb_frame.f_code.co_name
             ename = type(e).__name__
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-            print(msg)
+            # print(msg)
+            log.error(msg)
             raise
 
     # Decorator function to call the API
@@ -102,14 +107,14 @@ class SDApi:
             try:
                 res = func(*args, **kwargs)
             except Exception as e:
-                print(f"{type(e).__name__} Exception in {func.__name__}:\n{e}")
+                log.error(f"{type(e).__name__} Exception in {func.__name__}:\n{e}")
                 raise
             jresp = None
             try:
                 res.raise_for_status()
                 jresp = res.json()
             except Exception as e:
-                print(
+                log.error(
                     f"Reading json response: {type(e).__name__} Exception in {func.__name__}:\n{e}"
                 )
                 raise
@@ -141,6 +146,9 @@ class SDApi:
         """Post data to the SD API."""
         try:
             url = f"{self.url}/{route}"
+            log.debug(
+                f"POST request to {url}, headers: {self.headers}, params: {postdict}"
+            )
             return requests.post(url, headers=self.headers, data=json.dumps(postdict))
         except Exception as e:
             exci = sys.exc_info()[2]
@@ -148,13 +156,17 @@ class SDApi:
             fname = exci.tb_frame.f_code.co_name
             ename = type(e).__name__
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-            print(msg)
+            # print(msg)
+            log.error(msg)
             raise
 
     def apiGet(self, route, querydict={}):
         """Get data from the SD API."""
         try:
             url = f"{self.url}/{route}"
+            log.debug(
+                f"GET request to {url}, headers: {self.headers}, params: {querydict}"
+            )
             return requests.get(url, headers=self.headers, params=querydict)
         except Exception as e:
             exci = sys.exc_info()[2]
@@ -162,13 +174,17 @@ class SDApi:
             fname = exci.tb_frame.f_code.co_name
             ename = type(e).__name__
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-            print(msg)
+            # print(msg)
+            log.error(msg)
             raise
 
     def apiPut(self, route, querydict={}):
         """Put data to the SD API."""
         try:
             url = f"{self.url}/{route}"
+            log.debug(
+                f"PUT request to {url}, headers: {self.headers}, params: {querydict}"
+            )
             return requests.put(url, headers=self.headers, params=querydict)
         except Exception as e:
             exci = sys.exc_info()[2]
@@ -176,14 +192,14 @@ class SDApi:
             fname = exci.tb_frame.f_code.co_name
             ename = type(e).__name__
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-            print(msg)
+            # print(msg)
+            log.error(msg)
             raise
 
     def apiToken(self):
         """Obtain an API Token."""
         try:
-            if self.debug:
-                print("Asking for a token")
+            log.debug("Asking for a token")
             reqdata = {"username": self.username, "password": self.password}
             res = self.apiPost("token", reqdata)
             res.raise_for_status()
@@ -194,8 +210,7 @@ class SDApi:
                 self.tokenexpires = datetime.datetime.strptime(
                     jres["datetime"], "%Y-%m-%dT%H:%M:%SZ"
                 ).timestamp() + (3600 * 23)
-                if self.debug:
-                    print("Token obtained")
+                log.debug("Token obtained")
             else:
                 msg = f"code: {code}: "
                 msg += f"""jres["response"]"""
@@ -206,7 +221,8 @@ class SDApi:
             fname = exci.tb_frame.f_code.co_name
             ename = type(e).__name__
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-            print(msg)
+            # print(msg)
+            log.error(msg)
             raise
 
     def apiOnline(self):
@@ -219,13 +235,16 @@ class SDApi:
 
             xstatus = sdapiOnline()
             self.parseLatestStatus(xstatus)
+            state = "ONLINE" if self.online else "OFFLINE"
+            log.info(f"{state}: {self.statusmsg}")
         except Exception as e:
             exci = sys.exc_info()[2]
             lineno = exci.tb_lineno
             fname = exci.tb_frame.f_code.co_name
             ename = type(e).__name__
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-            print(msg)
+            # print(msg)
+            log.error(msg)
             raise
 
     def parseLatestStatus(self, xstatus):
@@ -250,7 +269,8 @@ class SDApi:
             fname = exci.tb_frame.f_code.co_name
             ename = type(e).__name__
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-            print(msg)
+            # print(msg)
+            log.error(msg)
             raise
 
     def available(self):
@@ -268,7 +288,8 @@ class SDApi:
             fname = exci.tb_frame.f_code.co_name
             ename = type(e).__name__
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-            print(msg)
+            # print(msg)
+            log.error(msg)
             raise
 
     def lineups(self, countrycode, postcode):
@@ -287,7 +308,8 @@ class SDApi:
             fname = exci.tb_frame.f_code.co_name
             ename = type(e).__name__
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-            print(msg)
+            # print(msg)
+            log.error(msg)
             raise
 
     def preview(self, lineupcode):
@@ -305,7 +327,8 @@ class SDApi:
             fname = exci.tb_frame.f_code.co_name
             ename = type(e).__name__
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-            print(msg)
+            # print(msg)
+            log.error(msg)
             raise
 
     def getLineup(self, lineupcode):
@@ -323,7 +346,8 @@ class SDApi:
             fname = exci.tb_frame.f_code.co_name
             ename = type(e).__name__
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-            print(msg)
+            # print(msg)
+            log.error(msg)
             raise
 
     def putLineup(self, lineupcode):
@@ -341,5 +365,6 @@ class SDApi:
             fname = exci.tb_frame.f_code.co_name
             ename = type(e).__name__
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-            print(msg)
+            # print(msg)
+            log.error(msg)
             raise
