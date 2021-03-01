@@ -28,6 +28,8 @@ log = ccalogging.log
 log.info("")
 log.info(f"{appname} {__version__} CLI Starting")
 
+# TODO use the new cache and lineup classes
+
 
 def askCredentials():
     try:
@@ -121,6 +123,8 @@ def getSchedules():
             setupCache(appname=appname)
         if sd.lineups is not None:
             for lineup in sd.lineups:
+                print(lineup)
+                break
                 ljson = sd.getLineup(lineup["lineupID"])
                 channeldict = parseLineupData(ljson)
                 byid = channeldict["channelsbyid"]
