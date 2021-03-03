@@ -90,10 +90,10 @@ def doConfigure():
 def setupSD(cfg):
     try:
         kwargs = {"appname": appname}
-        keymap = {"password": "sha1password"}
+        # keymap = {"password": "sha1password"}
         keys = ["username", "password", "url", "token", "tokenexpires"]
         for key in keys:
-            xkey = keymap[key] if key in keymap else key
+            # xkey = keymap[key] if key in keymap else key
             if key in cfg:
                 kwargs[xkey] = cfg[key]
         sd = SDApi(**kwargs)
