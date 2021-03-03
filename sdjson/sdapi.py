@@ -53,7 +53,7 @@ class SDApi:
 
         Args:
             username: str: Schedule Direct username
-            sha1password: str: sha1 encoded password for SD
+            password: str: sha1 encoded password for SD
             appname: str: Name that is used as the User-Agent header
             url: str: SD API URL - default is the beta 20191022 url
             debug: bool: print api calls and responses
