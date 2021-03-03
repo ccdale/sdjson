@@ -30,13 +30,10 @@ import time
 import ccalogging
 import requests
 
-from sdjson.cache import SDCache
-from sdjson.lineup import parseLineupData
 from sdjson import __version__
 
 log = ccalogging.log
 
-# TODO use the new cache and lineup classes
 # when the 20191022 api is out of beta the default url should be:
 # https://json.schedulesdirect.org/20191022
 class SDApi:
@@ -44,8 +41,8 @@ class SDApi:
 
     def __init__(
         self,
-        username,
-        sha1password,
+        username="",
+        sha1password="",
         appname="ccasdtv",
         url="https://w8xmzqba6c.execute-api.us-east-1.amazonaws.com/20191022",
         debug=False,
@@ -75,7 +72,6 @@ class SDApi:
             self.online = False
             self.statusmsg = "initialising"
             self.lineups = None
-            self.cache = SDCache(appname=self.appname)
             log.debug("SDApi initialising")
         except Exception as e:
             exci = sys.exc_info()[2]
