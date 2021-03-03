@@ -42,7 +42,7 @@ class SDApi:
     def __init__(
         self,
         username="",
-        sha1password="",
+        password="",
         appname="ccasdtv",
         url="https://w8xmzqba6c.execute-api.us-east-1.amazonaws.com/20191022",
         debug=False,
