@@ -31,6 +31,11 @@ log.info(f"{appname} {__version__} CLI Starting")
 # TODO use the new cache and lineup classes
 
 
+@click.group()
+def cli():
+    pass
+
+
 def askCredentials():
     try:
         uname = input("Schedules Direct username: ")
@@ -143,5 +148,39 @@ def getSchedules():
         sys.exit(1)
 
 
-if __name__ == "__main__":
-    getSchedules()
+def run():
+    try:
+        ckwargs = {"appname": appname}
+        cfg = CFG.readConfig(**ckwargs)
+        if "username" not in cfg:
+            msg = f"You will need to configure {appname} before using it."
+            print(msg)
+            sys.exit(1)
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        print("An Error occurred, see log file for details")
+        sys.exit(1)
+
+
+@cli.command()
+def configure():
+    f"""Sets up the configuration for the {appname} application."""
+    try:
+        cfg = {"amdirty": True}
+        ckwargs = {"appname": appname}
+        cfg["username"], cfg["password"] = askCredentials()
+        sd = testCreds(cfg["username"], cfg["password"])
+        CFG.writeConfig(cfg, **ckwargs)
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        print(msg)
+        raise
