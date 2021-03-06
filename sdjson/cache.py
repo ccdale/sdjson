@@ -148,7 +148,7 @@ class SDCache:
             log.error(msg)
             raise
 
-    def writeChannelToCache(chandata):
+    def writeChannelToCache(self, chandata):
         try:
             xdir = self.setupChannelDir(chandata["stationID"])
             channelfilename = xdir.joinpath(f"""{chandata["stationID"]}.json""")
@@ -164,7 +164,7 @@ class SDCache:
             log.error(msg)
             raise
 
-    def writeChannelScheduleToCache(stationid, chansched):
+    def writeChannelScheduleToCache(self, stationid, chansched):
         try:
             xdir = self.setupChannelDir(stationid)
             schedfilename = xdir.joinpath("schedule.json")
