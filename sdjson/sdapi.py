@@ -62,7 +62,7 @@ class SDApi:
         """
         try:
             self.username = username
-            self.password = sha1password
+            self.password = password
             self.appname = appname
             self.url = url
             self.debug = debug
