@@ -26,6 +26,8 @@ import ccalogging
 
 import sdjson.config as CFG
 from sdjson.sdapi import SDApi
+from sdjson.sduser import confUser
+from sdjson.sduser import testCreds
 from sdjson import __version__
 
 appname = "ccasdtv"
@@ -35,92 +37,6 @@ logfilename = home.joinpath(f".{appname}.log")
 ccalogging.setLogFile(logfilename)
 ccalogging.setDebug()
 log = ccalogging.log
-
-
-def askMe(q, default, required=False):
-    """Input routine for the console.
-
-    Args:
-        q: str input question
-        default: str default answer
-
-    Raises:
-        TypeError: if input `q` is not a string
-
-    Returns:
-        str: user input or default
-    """
-    try:
-        if type(q) is not str:
-            raise TypeError("Input error, question is not a string.")
-        ret = default
-        val = input(f"{q} ({default}) > ")
-        if len(val) > 0:
-            ret = val
-        if len(ret) == 0 and required:
-            raise Exception(f"Input value: {q} is required")
-        return ret
-    except Exception as e:
-        exci = sys.exc_info()[2]
-        lineno = exci.tb_lineno
-        fname = exci.tb_frame.f_code.co_name
-        ename = type(e).__name__
-        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-        log.error(msg)
-        raise
-
-
-def askCredentials():
-    try:
-        uname = askMe("Schedules Direct username: ", "", required=True)
-        password = askMe("SD Password: ", "", required=True)
-        pword = hashlib.sha1(password.encode()).hexdigest()
-        return (uname, pword)
-    except Exception as e:
-        exci = sys.exc_info()[2]
-        lineno = exci.tb_lineno
-        fname = exci.tb_frame.f_code.co_name
-        ename = type(e).__name__
-        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-        log.error(msg)
-        raise
-
-
-def testCreds(uname, pword):
-    try:
-        sd = SDApi(uname, pword)
-        sd.apiOnline()
-        if not sd.online:
-            print(sd.statusmsg)
-            raise Exception("Schedules Direct is not online")
-        log.debug("Supplied credentials appear to be correct")
-        return sd
-    except Exception as e:
-        exci = sys.exc_info()[2]
-        lineno = exci.tb_lineno
-        fname = exci.tb_frame.f_code.co_name
-        ename = type(e).__name__
-        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-        log.error(msg)
-        raise
-
-
-def confUser(cfg):
-    try:
-        if "username" in cfg:
-            resp = askMe(f"""keep user creds: {cfg["username"]}""", "Y")
-            if resp == "Y":
-                return cfg
-        cfg["username"], cfg["password"] = askCredentials()
-        return cfg
-    except Exception as e:
-        exci = sys.exc_info()[2]
-        lineno = exci.tb_lineno
-        fname = exci.tb_frame.f_code.co_name
-        ename = type(e).__name__
-        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-        log.error(msg)
-        raise
 
 
 def configure():
