@@ -25,8 +25,6 @@ import ccalogging
 
 log = ccalogging.log
 
-cachedict = None
-
 # TODO test this class
 class SDCache:
     """Cache class for the ccasdtv application."""
@@ -116,12 +114,12 @@ class SDCache:
     def setupCache(self):
         """Sets up the cache directories for the ccasdtv application."""
         try:
-            global cachedict
+            # global cachedict
             log.debug("Setting up cache locations")
-            cachedict = {}
-            cachedict["cachedir"] = self.makeCacheDir(dtype="cache")
-            cachedict["chandir"] = self.makeCacheDir(dtype="channel")
-            cachedict["progdir"] = self.makeCacheDir(dtype="program")
+            self.cachedict = {}
+            self.cachedict["cachedir"] = self.makeCacheDir(dtype="cache")
+            self.cachedict["chandir"] = self.makeCacheDir(dtype="channel")
+            self.cachedict["progdir"] = self.makeCacheDir(dtype="program")
         except Exception as e:
             exci = sys.exc_info()[2]
             lineno = exci.tb_lineno

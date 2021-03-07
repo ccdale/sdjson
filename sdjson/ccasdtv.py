@@ -8,9 +8,7 @@ import sys
 import ccalogging
 import click
 
-from sdjson.cache import cachedict
-from sdjson.cache import setupCache
-from sdjson.cache import writeChannelToCache
+from sdjson.cache import SDCache
 import sdjson.config as CFG
 from sdjson.lineup import parseLineupData
 from sdjson.sdapi import SDApi
@@ -28,7 +26,7 @@ log = ccalogging.log
 log.info("")
 log.info(f"{appname} {__version__} CLI Starting")
 
-# TODO use the new cache and lineup classes
+# TODO use the new cache class
 
 
 @click.group()
@@ -148,7 +146,9 @@ def getSchedules():
         sys.exit(1)
 
 
+@click.command()
 def run():
+    """Retrieves listings from Schedules Direct"""
     try:
         ckwargs = {"appname": appname}
         cfg = CFG.readConfig(**ckwargs)
