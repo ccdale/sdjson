@@ -178,12 +178,12 @@ class SDCache:
             log.error(msg)
             raise
 
-    def writeLineupData(self, linupid, ldata):
+    def writeLineupData(self, lineupid, ldata):
         try:
             cachedir = self.getCacheDir()
             lineupfn = cachedir.joinpath(f"{lineupid}.json")
             with open(lineupfn, "w") as lfn:
-                json.dump(ldata, xfn, seperators=(",", ":"))
+                json.dump(ldata, lfn, seperators=(",", ":"))
         except Exception as e:
             exci = sys.exc_info()[2]
             lineno = exci.tb_lineno
