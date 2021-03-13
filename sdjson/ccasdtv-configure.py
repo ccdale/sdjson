@@ -18,7 +18,6 @@
 #     along with ccasdtv.  If not, see <http://www.gnu.org/licenses/>.
 """Configuration for the ccasdtv application."""
 
-import hashlib
 from pathlib import Path
 import sys
 
@@ -41,6 +40,30 @@ ccalogging.setDebug()
 log = ccalogging.log
 
 
+def checkLineup(sd, sdc, cfglineup):
+    """Checks that the lineup is not out of date."""
+    try:
+        for slu in sd.lineups:
+            if cfglineup["lineupid"] == slu["lineupID"]:
+                lum = sd.getTimeStamp(slu["modified"])
+                if int(cfglineup["modified"]) < lum:
+                    log.info(
+                        f"""Lineup {slu["lineupID"]} is out of date, retrieving fresh data."""
+                    )
+                    ldata = parseLineupData(sd.getLineup(slu["lineupID"]))
+                    sdc.writeLineupData(slu["lineupID"], ldata)
+                    cfglineup["modified"] = lum
+        return cfglineup
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        print(msg)
+        raise
+
+
 def configure():
     f"""Sets up the configuration for the {appname} application."""
     try:
@@ -49,18 +72,19 @@ def configure():
         cfg = CFG.readConfig(**ckwargs)
         cfg = confUser(cfg)
         sd = testCreds(cfg["username"], cfg["password"])
+        sys.exit(0)
         cfg["amdirty"] = True
         cfg["token"] = sd.token
         cfg["tokenexpires"] = sd.tokenexpires
         sdc = SDCache(**ckwargs)
         sdc.setupCache()
-        cfg["lineups"] = []
-        if sd.lineups is not None:
-            for lu in sd.lineups:
-                ldata = parseLineupData(sd.getLineup(lu["lineupID"]))
-                lineup = {"lineupid": lu["lineupID"], "modified": ldata["modified"]}
-                cfg["lineups"].append(lineup)
-                sdc.writeLineupData(lu["lineupID"], ldata)
+        # check that the lineup is not out of date
+        if "lineups" in cfg and sd.lineups is not None:
+            xlineups = []
+            for lineup in cfg["lineups"]:
+                xlineups.append(checkLineup(sd, sdc, lineup))
+                cfg["amdirty"] = True
+            cfg["lineups"] = xlineups
         CFG.writeConfig(cfg, **ckwargs)
     except Exception as e:
         exci = sys.exc_info()[2]
