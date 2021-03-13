@@ -26,6 +26,7 @@ import ccalogging
 
 from sdjson.cache import SDCache
 import sdjson.config as CFG
+from sdjson.lineup import parseLineupData
 from sdjson.sdapi import SDApi
 from sdjson.sduser import confUser
 from sdjson.sduser import testCreds
@@ -56,8 +57,9 @@ def configure():
         cfg["lineups"] = []
         if sd.lineups is not None:
             for lu in sd.lineups:
-                cfg["lineups"].append(lu["lineupID"])
-                ldata = sd.getLineup(lu["lineupID"])
+                ldata = parseLineupData(sd.getLineup(lu["lineupID"]))
+                lineup = {"lineupid": lu["lineupID"], "modified": ldata["modified"]}
+                cfg["lineups"].append(lineup)
                 sdc.writeLineupData(lu["lineupID"], ldata)
         CFG.writeConfig(cfg, **ckwargs)
     except Exception as e:
