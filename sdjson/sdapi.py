@@ -254,7 +254,7 @@ class SDApi:
                 raise Exception(f"SD API is Offline: {sd.statusmsg}")
             if "lineups" in xstatus:
                 self.lineups = xstatus["lineups"]
-                self.showResponse(xstatus["lineups"], force=True)
+                # self.showResponse(xstatus["lineups"], force=True)
         except Exception as e:
             exci = sys.exc_info()[2]
             lineno = exci.tb_lineno
