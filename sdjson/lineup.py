@@ -17,6 +17,7 @@
 #     along with ccasdtv.  If not, see <http://www.gnu.org/licenses/>.
 """Schedules Direct Lineup functions for ccasdtv."""
 
+import datetime
 import sys
 
 import ccalogging
@@ -67,6 +68,10 @@ def parseLineupData(jdata):
             channums = parseChannelMap(jdata["map"])
         if channums is not None and "stations" in jdata:
             channeldict = parseStations(jdata["stations"], channums)
+        if "metadata" in jdata and "modified" in jdata["metadata"]:
+            channeldict["modified"] = datetime.datetime.strptime(
+                jdata["metadata"]["modified"], "%Y-%m-%dT%H:%M:%SZ"
+            ).timestamp()
         return channeldict
     except Exception as e:
         exci = sys.exc_info()[2]
