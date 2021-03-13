@@ -100,6 +100,19 @@ class SDApi:
             log.error(msg)
             raise
 
+    def getTimeStamp(self, dt, dtformat="%Y-%m-%dT%H:%M:%SZ"):
+        """Returns the integer epoch timestamp for the date time described by dt."""
+        try:
+            return int(datetime.datetime.strptime(dt, dtformat).timestamp())
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            print(msg)
+            raise
+
     # Decorator function to call the API
     def apiNoToken(self, func):
         """Call the API, handle any errors, return the JSON payload."""
@@ -209,9 +222,7 @@ class SDApi:
             code = int(jres["code"])
             if code == 0:
                 self.token = jres["token"]
-                self.tokenexpires = datetime.datetime.strptime(
-                    jres["datetime"], "%Y-%m-%dT%H:%M:%SZ"
-                ).timestamp() + (3600 * 23)
+                self.tokenexpires = self.getTimeStamp(jres["datetime"]) + (3600 * 23)
                 log.debug("Token obtained")
             else:
                 msg = f"code: {code}: "
@@ -243,6 +254,7 @@ class SDApi:
                 raise Exception(f"SD API is Offline: {sd.statusmsg}")
             if "lineups" in xstatus:
                 self.lineups = xstatus["lineups"]
+                self.showResponse(xstatus["lineups"], force=True)
         except Exception as e:
             exci = sys.exc_info()[2]
             lineno = exci.tb_lineno
@@ -259,9 +271,7 @@ class SDApi:
             if "systemStatus" in xstatus:
                 latest = 0
                 for xst in xstatus["systemStatus"]:
-                    pdt = datetime.datetime.strptime(
-                        xst["date"], "%Y-%m-%dT%H:%M:%SZ"
-                    ).timestamp()
+                    pdt = self.getTimeStamp(xst["date"])
                     if pdt > latest:
                         latest = pdt
                         if xst["status"] == "Online":
