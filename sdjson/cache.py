@@ -183,7 +183,7 @@ class SDCache:
             cachedir = self.getCacheDir()
             lineupfn = cachedir.joinpath(f"{lineupid}.json")
             with open(lineupfn, "w") as lfn:
-                json.dump(ldata, lfn, seperators=(",", ":"))
+                json.dump(ldata, lfn, separators=(",", ":"))
         except Exception as e:
             exci = sys.exc_info()[2]
             lineno = exci.tb_lineno
