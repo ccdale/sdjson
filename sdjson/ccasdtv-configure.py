@@ -24,6 +24,7 @@ import sys
 
 import ccalogging
 
+from sdjson.cache import SDCache
 import sdjson.config as CFG
 from sdjson.sdapi import SDApi
 from sdjson.sduser import confUser
@@ -50,10 +51,14 @@ def configure():
         cfg["amdirty"] = True
         cfg["token"] = sd.token
         cfg["tokenexpires"] = sd.tokenexpires
+        sdc = SDCache(**ckwargs)
+        sdc.setupCache()
         cfg["lineups"] = []
         if sd.lineups is not None:
             for lu in sd.lineups:
                 cfg["lineups"].append(lu["lineupID"])
+                ldata = sd.getLineup(lu["lineupID"])
+                sdc.writeLineupData(lu["lineupID"], ldata)
         CFG.writeConfig(cfg, **ckwargs)
     except Exception as e:
         exci = sys.exc_info()[2]
