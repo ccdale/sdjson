@@ -177,3 +177,18 @@ class SDCache:
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
             log.error(msg)
             raise
+
+    def writeLineupData(self, linupid, ldata):
+        try:
+            cachedir = self.getCacheDir()
+            lineupfn = cachedir.joinpath(f"{lineupid}.json")
+            with open(lineupfn, "w") as lfn:
+                json.dump(ldata, xfn, seperators=(",", ":"))
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            print(msg)
+            raise
