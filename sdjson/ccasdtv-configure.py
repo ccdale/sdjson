@@ -71,7 +71,12 @@ def configure():
         ckwargs = {"appname": appname}
         cfg = CFG.readConfig(**ckwargs)
         cfg = confUser(cfg)
-        sd = testCreds(cfg["username"], cfg["password"])
+        if "token" not in cfg:
+            cfg["token"] = "X"
+            cfg["tokenexpires"] = 0
+        sd = testCreds(
+            cfg["username"], cfg["password"], cfg["token"], cfg["tokenexpires"]
+        )
         sys.exit(0)
         cfg["amdirty"] = True
         cfg["token"] = sd.token

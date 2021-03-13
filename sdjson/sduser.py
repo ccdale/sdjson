@@ -75,9 +75,9 @@ def askCredentials():
         raise
 
 
-def testCreds(uname, pword):
+def testCreds(uname, pword, token, tokenexpires):
     try:
-        sd = SDApi(uname, pword)
+        sd = SDApi(uname, pword, token=token, tokenexpires=tokenexpires)
         sd.apiOnline()
         if not sd.online:
             print(sd.statusmsg)
