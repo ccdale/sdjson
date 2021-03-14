@@ -146,13 +146,32 @@ class SDCache:
             log.error(msg)
             raise
 
-    def writeChannelToCache(self, chandata):
+    def writeChannelToCache(self, chandata, overwrite=False):
         try:
             xdir = self.setupChannelDir(chandata["stationID"])
             channelfilename = xdir.joinpath(f"""{chandata["stationID"]}.json""")
-            log.debug(f"saving channel data to {channelfilename}")
-            with open(channelfilename, "w") as cfn:
-                json.dump(chandata, cfn, separators=(",", ":"))
+            if overwrite or not Path.exists(channelfilename):
+                log.debug(f"saving channel data to {channelfilename}")
+                with open(channelfilename, "w") as cfn:
+                    json.dump(chandata, cfn, separators=(",", ":"))
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            log.error(msg)
+            raise
+
+    def readChannelDataById(self, chanid):
+        try:
+            cdata = None
+            xdir = self.setupChannelDir(chanid)
+            channelfilename = xdir.joinpath(f"{chanid}.json")
+            if Path.exists(channelfilename):
+                with open(channelfilename, "r") as cfn:
+                    cdata = json.load(cfn)
+            return cdata
         except Exception as e:
             exci = sys.exc_info()[2]
             lineno = exci.tb_lineno
@@ -184,6 +203,27 @@ class SDCache:
             lineupfn = cachedir.joinpath(f"{lineupid}.json")
             with open(lineupfn, "w") as lfn:
                 json.dump(ldata, lfn, separators=(",", ":"))
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            print(msg)
+            raise
+
+    def readLineupData(self, lineupid):
+        try:
+            ldata = None
+            cachedir = self.getCacheDir()
+            lineupfn = cachedir.joinpath(f"{lineupid}.json")
+            if Path.exists(lineupfn):
+                log.debug(f"Reading lineup file {lineupfn}")
+                with open(lineupfn, "r") as lfn:
+                    ldata = json.load(lfn)
+            else:
+                raise Exception(f"lineup path {lineupfn} does not exist")
+            return ldata
         except Exception as e:
             exci = sys.exc_info()[2]
             lineno = exci.tb_lineno
