@@ -166,7 +166,6 @@ def channelSelector(cfg, chandata):
             [sg.T("Available Channels"), sg.T("Selected Channels")],
             [
                 sg.Listbox(
-                    "Available Channels",
                     values=unselchans,
                     size=(50, 40),
                     key="ULB",
