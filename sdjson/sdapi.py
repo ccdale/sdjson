@@ -458,3 +458,20 @@ class SDApi:
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
             log.error(msg)
             raise
+
+    def getPrograms(self, progids):
+        try:
+
+            @self.apiTokenRequired
+            def sdgetprograms():
+                return self.apiPost("programs", progids)
+
+            return sdgetprograms()
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            log.error(msg)
+            raise
