@@ -384,3 +384,77 @@ class SDApi:
             # print(msg)
             log.error(msg)
             raise
+
+    def getScheduleMd5(self, chanids):
+        """Retrieve the md5 hashes for the supplied channel schedules."""
+        try:
+            chans = []
+            for chanid in chanids:
+                chans.append({"stationID": str(chanid)})
+
+            @self.apiTokenRequired
+            def sdgetschedulemd5():
+                return self.apiPost("schedules/md5", chans)
+
+            return sdgetschedulemd5()
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            log.error(msg)
+            raise
+
+    def getFullSchedules(self, chanids):
+        """Retrieves the full schedules that are available for each channel id."""
+        try:
+            chans = []
+            for chanid in chanids:
+                chans.append({"stationID": str(chanid)})
+
+            @self.apiTokenRequired
+            def sdgetfullschedules():
+                return self.apiPost("schedules", chans)
+
+            return sdgetfullschedules()
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            log.error(msg)
+            raise
+
+    def getSchedules(self, chans):
+        """Retrieves the dated schedule for each channel in the input dictionary.
+
+        arg:
+            chans: list of dictionaries
+            [
+                {
+                    "stationID": "20454",
+                    "date": ["2020-01-21", "2020-01-22"]
+                }
+            ]
+            The list of dates are the dates that a schedule is out of date for.
+
+            This list of dicts. must be created as above, as it is passed
+            direct to Schedules Direct
+        """
+        try:
+
+            @self.apiTokenRequired
+            def sdgetschedules():
+                return self.apiPost("schedules", chans)
+
+            return sdgetschedules()
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            log.error(msg)
+            raise
