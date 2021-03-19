@@ -45,19 +45,21 @@ def usernamePassword(username=""):
         layout = [
             [sg.T("SD Username"), sg.I(username, key="UIN")],
             [sg.T("SD Password"), sg.I(key="PIN")],
-            [sg.CB("Save password in config file", default=True, key="SPW")],
+            # [sg.CB("Save password in config file", default=True, key="SPW")],
             [sg.Submit(key="submit"), sg.Cancel(key="cancel")],
         ]
         window = sg.Window("Schedules Direct Credentials.", layout)
         event, values = window.read()
         window.close()
-        un = pw = chkbx = None
+        # un = pw = chkbx = None
+        un = pw = None
         if event == "submit":
             un = values["UIN"]
             pw = values["PIN"]
-            chkbx = values["SPW"]
+            # chkbx = values["SPW"]
         log.debug(f"event: {event}, values: {values}")
-        return un, pw, chkbx
+        # return un, pw, chkbx
+        return un, pw
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
@@ -80,13 +82,19 @@ def testCredsConfig(cfg):
             username = cfg["username"]
         if needconfig:
             log.debug("Configuration required")
-            username, password, storepw = usernamePassword(username)
+            # username, password, storepw = usernamePassword(username)
+            username, password = usernamePassword(username)
             if username:
                 cfg["username"] = username
                 cfg["amdirty"] = True
-            if password and storepw:
+            # if password and storepw:
+            if password:
                 cfg["password"] = hashlib.sha1(password.encode()).hexdigest()
                 cfg["amdirty"] = True
+        if "password" not in cfg or "username" not in cfg:
+            raise Exception(
+                "Username and/or Password for Schedulesdirect not supplied."
+            )
         return cfg
     except Exception as e:
         exci = sys.exc_info()[2]
@@ -245,3 +253,8 @@ def gRun():
         ename = type(e).__name__
         msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
         log.error(msg)
+        layout = [[sg.T(msg)], [sg.Cancel()]]
+        window = sg.Window("An Error Occurred.", layout)
+        event, values = window.read()
+        window.close()
+        sys.exit(1)
