@@ -146,7 +146,7 @@ class SDCache:
             log.error(msg)
             raise
 
-    def writeChannel(self, scheddata):
+    def writeChannelSchedule(self, scheddata):
         try:
             chanid = scheddata["stattionID"]
             xdir = self.setupChannelDir(chanid)
@@ -163,7 +163,7 @@ class SDCache:
             log.error(msg)
             raise
 
-    def readChannel(self, chanid):
+    def readChannelSchedule(self, chanid):
         try:
             jdata = None
             xdir = self.setupChannelDir(chanid)
