@@ -20,6 +20,7 @@ pytest = "^6.2.2"
 ccasdtv = "sdjson.ccasdtv:run"
 tvconf = "sdjson.ccasdtv-configure:configure"
 ptvg = "sdjson.ccasdtvg:gRun"
+jsonprint = "printjson:jprint"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
