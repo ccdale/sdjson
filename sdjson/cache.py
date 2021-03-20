@@ -146,6 +146,76 @@ class SDCache:
             log.error(msg)
             raise
 
+    def writeChannel(self, scheddata):
+        try:
+            chanid = scheddata["stattionID"]
+            xdir = self.setupChannelDir(chanid)
+            cfn = xdir.joinpath(f"""{chanid}-schedule.json""")
+            log.debug(f"saving schedule data to {cfn}")
+            with open(cfn, "w") as ofn:
+                json.dump(scheddata, ofn, separators=(",", ":"))
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            log.error(msg)
+            raise
+
+    def readChannel(self, chanid):
+        try:
+            jdata = None
+            xdir = self.setupChannelDir(chanid)
+            cfn = xdir.joinpath(f"""{chanid}-schedule.json""")
+            if cfn.exists():
+                with open(cfn, "r") as ifn:
+                    jdata = json.load(ifn)
+            return jdata
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            log.error(msg)
+            raise
+
+    def writeChannelMd5(self, md5data):
+        try:
+            chanid = md5data["stattionID"]
+            xdir = self.setupChannelDir(chanid)
+            cfn = xdir.joinpath(f"""{chanid}-schedule-md5.json""")
+            log.debug(f"saving md5 data to {cfn}")
+            with open(cfn, "w") as ofn:
+                json.dump(md5data, ofn, separators=(",", ":"))
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            log.error(msg)
+            raise
+
+    def readChannelMd5(self, chanid):
+        try:
+            jdata = None
+            xdir = self.setupChannelDir(chanid)
+            cfn = xdir.joinpath(f"""{chanid}-schedule-md5.json""")
+            if cfn.exists():
+                with open(cfn, "r") as ifn:
+                    jdata = json.load(ifn)
+            return jdata
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            log.error(msg)
+            raise
+
     def writeChannelToCache(self, chandata, overwrite=False):
         try:
             xdir = self.setupChannelDir(chandata["stationID"])
@@ -168,7 +238,7 @@ class SDCache:
             cdata = None
             xdir = self.setupChannelDir(chanid)
             channelfilename = xdir.joinpath(f"{chanid}.json")
-            if Path.exists(channelfilename):
+            if channelfilename.exists():
                 with open(channelfilename, "r") as cfn:
                     cdata = json.load(cfn)
             return cdata
