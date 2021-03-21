@@ -36,6 +36,8 @@ log = ccalogging.log
 
 # when the 20191022 api is out of beta the default url should be:
 # https://json.schedulesdirect.org/20191022
+# 20191022 fails at the get schedulesmd5 step, switching to
+# https://json.schedulesdirect.org/20141201
 class SDApi:
     """Schedules Direct API class."""
 
@@ -44,7 +46,9 @@ class SDApi:
         username="",
         password="",
         appname="ccasdtv",
-        url="https://w8xmzqba6c.execute-api.us-east-1.amazonaws.com/20191022",
+        # url="https://w8xmzqba6c.execute-api.us-east-1.amazonaws.com/20191022",
+        # url="https://json.schedulesdirect.org/20191022",
+        url="https://json.schedulesdirect.org/20141201",
         debug=False,
         token=None,
         tokenexpires=0,
