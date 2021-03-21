@@ -167,7 +167,11 @@ def checkLineup(sd, sdc, cfglineup):
 def channelSelector(cfg, chandata):
     try:
         cns = chandata["channelsbyname"]
-        selchans = [] if "channels" not in cfg else cfg["channels"]
+        selchans = []
+        if "channels" in cfg:
+            for channel in cfg["channels"]:
+                selchans.append(f"""{channel["stationid"]} {channel["name"]}""")
+        # selchans = [] if "channels" not in cfg else cfg["channels"]
         unselchans = [f"""{cns[x]["stationID"]:7} {x}""" for x in sorted(cns)]
         # unselchans = [x for x in sorted(chandata["channelsbyname"])]
         layout = [
@@ -201,9 +205,45 @@ def channelSelector(cfg, chandata):
             else:
                 break
         win.close()
-        cfg["channels"] = selchans
+        channels = []
+        for chan in selchans:
+            tmp = chan.split(" ", 1)
+            chanid = tmp[0]
+            channame = tmp[1].strip()
+            log.debug(f"tmp: {tmp}")
+            channels.append({"stationid": chanid, "name": channame})
+        cfg["channels"] = channels
         cfg["amdirty"] = True
         return cfg
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def mainWindow(cfg, sd):
+    try:
+        pass
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def chanSchedules(cfg, sd, sdc):
+    try:
+        chanlist = [chan["stationid"] for chan in cfg["channels"]]
+        schedmd5 = sd.getScheduleMd5(chanlist)
+        for smd5 in schedmd5:
+            sdc.writeChannelMd5(smd5, schedmd5[smd5])
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
@@ -231,21 +271,23 @@ def gRun():
         if not sd.online:
             errorWindow(sd.statusmsg)
             sys.exit(1)
-        if "lineups" in cfg and sd.lineups is not None:
-            xlineups = []
-            for lineup in cfg["lineups"]:
-                xlineups.append(checkLineup(sd, sdc, lineup))
-                cfg["amdirty"] = True
-            cfg["lineups"] = xlineups
-        for lineup in cfg["lineups"]:
-            ldata = sdc.readLineupData(lineup["lineupid"])
-            log.debug(f"""writing lineup data to disk for {lineup["lineupid"]}""")
-            for chan in ldata["channelsbyid"]:
-                sdc.writeChannelToCache(ldata["channelsbyid"][chan])
-            log.debug("lineup data write completed.")
-        cfg = channelSelector(cfg, ldata)
-        ckwargs = {"appname": appname}
-        CFG.writeConfig(cfg, **ckwargs)
+        # if "lineups" in cfg and sd.lineups is not None:
+        #     xlineups = []
+        #     for lineup in cfg["lineups"]:
+        #         xlineups.append(checkLineup(sd, sdc, lineup))
+        #         cfg["amdirty"] = True
+        #     cfg["lineups"] = xlineups
+        # for lineup in cfg["lineups"]:
+        #     ldata = sdc.readLineupData(lineup["lineupid"])
+        #     log.debug(f"""writing lineup data to disk for {lineup["lineupid"]}""")
+        #     for chan in ldata["channelsbyid"]:
+        #         sdc.writeChannelToCache(ldata["channelsbyid"][chan])
+        #     log.debug("lineup data write completed.")
+        # cfg = channelSelector(cfg, ldata)
+        chanSchedules(cfg, sd, sdc)
+
+        # ckwargs = {"appname": appname}
+        # CFG.writeConfig(cfg, **ckwargs)
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
