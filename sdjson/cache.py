@@ -146,9 +146,9 @@ class SDCache:
             log.error(msg)
             raise
 
-    def writeChannelSchedule(self, scheddata):
+    def writeChannelSchedule(self, chanid, scheddata):
         try:
-            chanid = scheddata["stattionID"]
+            # chanid = scheddata["stattionID"]
             xdir = self.setupChannelDir(chanid)
             cfn = xdir.joinpath(f"""{chanid}-schedule.json""")
             log.debug(f"saving schedule data to {cfn}")
@@ -181,9 +181,9 @@ class SDCache:
             log.error(msg)
             raise
 
-    def writeChannelMd5(self, md5data):
+    def writeChannelMd5(self, chanid, md5data):
         try:
-            chanid = md5data["stattionID"]
+            # chanid = md5data["stattionID"]
             xdir = self.setupChannelDir(chanid)
             cfn = xdir.joinpath(f"""{chanid}-schedule-md5.json""")
             log.debug(f"saving md5 data to {cfn}")
