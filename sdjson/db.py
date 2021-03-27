@@ -3,6 +3,10 @@
 import sqlite3
 from pathlib import Path
 
+import ccalogging
+
+log = ccalogging.log
+
 
 class SDDb:
     def __init__(self, appname="ccasdtv"):
@@ -16,7 +20,7 @@ class SDDb:
             fname = exci.tb_frame.f_code.co_name
             ename = type(e).__name__
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-            print(msg)
+            log.error(msg)
             raise
 
     def getConnection(self):
@@ -28,7 +32,7 @@ class SDDb:
             fname = exci.tb_frame.f_code.co_name
             ename = type(e).__name__
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-            print(msg)
+            log.error(msg)
             raise
 
     def doSql(self, sql, dictionary=True, one=False):
@@ -51,5 +55,5 @@ class SDDb:
             fname = exci.tb_frame.f_code.co_name
             ename = type(e).__name__
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-            print(msg)
+            log.error(msg)
             raise
