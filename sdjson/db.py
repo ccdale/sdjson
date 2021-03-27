@@ -57,3 +57,22 @@ class SDDb:
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
             log.error(msg)
             raise
+
+    def sql(self, sql, values=None):
+        try:
+            rows = None
+            self.getConnection()
+            with self.connection:
+                c = self.connection.cursor()
+                c.execute(sql) if values is None else c.execute(sql, values)
+                rows = c.fetchall()
+            self.connection.close()
+            return rows
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            log.error(msg)
+            raise
