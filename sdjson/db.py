@@ -5,15 +5,18 @@ from pathlib import Path
 
 import ccalogging
 
+from sdjson.cache import SDCache
+
 log = ccalogging.log
 
 
 class SDDb:
     def __init__(self, appname="ccasdtv"):
         try:
+            sc = SDCache(appname)
+            cd = sc.getCacheDir()
             dbfn = f"{appname}.db"
-            home = Path.home()
-            self.dbpath = home.joinpath(".config", dbfn)
+            self.dbpath = cd.joinpath(dbfn)
         except Exception as e:
             exci = sys.exc_info()[2]
             lineno = exci.tb_lineno
