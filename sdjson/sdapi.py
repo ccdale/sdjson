@@ -22,7 +22,6 @@ re-written in my coding style, with added token caching/renewing
 Thankyou Steven T. Smith.
 """
 
-import datetime
 import json
 import sys
 import time
@@ -30,6 +29,7 @@ import time
 import ccalogging
 import requests
 
+from sdjson.ccabase import Base
 from sdjson import __version__
 
 log = ccalogging.log
@@ -38,7 +38,7 @@ log = ccalogging.log
 # https://json.schedulesdirect.org/20191022
 # 20191022 fails at the get schedulesmd5 step, switching to
 # https://json.schedulesdirect.org/20141201
-class SDApi:
+class SDApi(Base):
     """Schedules Direct API class."""
 
     def __init__(
@@ -85,36 +85,6 @@ class SDApi:
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
             # print(msg)
             log.error(msg)
-            raise
-
-    def showResponse(self, jresp, force=False):
-        """Pretty print json responses."""
-        try:
-            if self.debug or force:
-                print(
-                    json.dumps(jresp, indent=4, sort_keys=True), end="\n\n", flush=True
-                )
-        except Exception as e:
-            exci = sys.exc_info()[2]
-            lineno = exci.tb_lineno
-            fname = exci.tb_frame.f_code.co_name
-            ename = type(e).__name__
-            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-            # print(msg)
-            log.error(msg)
-            raise
-
-    def getTimeStamp(self, dt, dtformat="%Y-%m-%dT%H:%M:%SZ"):
-        """Returns the integer epoch timestamp for the date time described by dt."""
-        try:
-            return int(datetime.datetime.strptime(dt, dtformat).timestamp())
-        except Exception as e:
-            exci = sys.exc_info()[2]
-            lineno = exci.tb_lineno
-            fname = exci.tb_frame.f_code.co_name
-            ename = type(e).__name__
-            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-            print(msg)
             raise
 
     # Decorator function to call the API
