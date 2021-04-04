@@ -275,7 +275,10 @@ def insertChanMd5DB(sdb, chanid, date, cdata):
                 sql += "values (?, ?, ?, ?, ?)"
                 lmts = sdb.getTimeStamp(cdata["lastModified"])
                 dts = sdb.getTimeStamp(date, dtformat="%Y-%m-%d")
-                rows = sdb.sql(sql, [cdata["md5"], chanid, date, dts, lmts])
+                if sdb.insertSql(sql, [cdata["md5"], chanid, date, dts, lmts]):
+                    log.debug("new data inserted for channel md5")
+                else:
+                    log.debug("data already exists")
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
