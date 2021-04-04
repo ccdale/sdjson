@@ -21,12 +21,10 @@ import json
 from pathlib import Path
 import sys
 
-import ccalogging
-
-log = ccalogging.log
+from sdjson.ccabase import Base
 
 # TODO test this class
-class SDCache:
+class SDCache(Base):
     """Cache class for the ccasdtv application."""
 
     def __init__(self, appname="ccasdtv"):
