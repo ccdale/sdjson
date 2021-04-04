@@ -19,6 +19,7 @@
 """ccasdtv personal tv guide application."""
 
 import hashlib
+import json
 from pathlib import Path
 import sys
 
@@ -27,6 +28,7 @@ import PySimpleGUI as sg
 
 from sdjson.cache import SDCache
 import sdjson.config as CFG
+from sdjson.db import SDDb
 from sdjson.lineup import parseLineupData
 from sdjson.sdapi import SDApi
 from sdjson import __version__
@@ -238,12 +240,86 @@ def mainWindow(cfg, sd):
         raise
 
 
-def chanSchedules(cfg, sd, sdc):
+def testDictKeys(idict, keyslist, optkeyslist=None):
+    try:
+        kerror = True
+        for ikey in keyslist:
+            if ikey not in idict:
+                kerror = False
+                log.error(f"required key {ikey} not in dict {idict}")
+                break
+        if kerror and optkeyslist is not None:
+            for ikey in optkeyslist:
+                if ikey not in idict:
+                    kerror = False
+                    log.error(f"optional key {ikey} not in dict {idict}")
+                    break
+        return kerror
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def insertChanMd5DB(sdb, chanid, date, cdata):
+    try:
+        reqkeys = ["code", "lastModified", "md5", "message"]
+        if testDictKeys(cdata, reqkeys):
+            if int(cdata["code"]) == 0:
+                sql = "insert into schedulemd5 "
+                sql += "(md5, stationid, datestr, datets, modified) "
+                sql += "values (?, ?, ?, ?, ?)"
+                lmts = sdb.getTimeStamp(cdata["lastModified"])
+                dts = sdb.getTimeStamp(date, dtformat="%Y-%m-%d")
+                rows = sdb.sql(sql, [cdata["md5"], chanid, date, dts, lmts])
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def chanMd5DB(cfg, sd, sdb):
     try:
         chanlist = [chan["stationid"] for chan in cfg["channels"]]
         schedmd5 = sd.getScheduleMd5(chanlist)
-        for smd5 in schedmd5:
-            sdc.writeChannelMd5(smd5, schedmd5[smd5])
+        for chan in schedmd5:
+            for date in schedmd5[chan]:
+                ddata = schedmd5[chan][date]
+                insertChanMd5DB(sdb, chan, date, ddata)
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def chanSchedules(cfg, sd, sdc, sdb):
+    try:
+        chanlist = [chan["stationid"] for chan in cfg["channels"]]
+        # schedmd5 = sd.getScheduleMd5(chanlist)
+        # for smd5 in schedmd5:
+        #     sdc.writeChannelMd5(smd5, schedmd5[smd5])
+        # fullsched = sd.getFullSchedules(chanlist)
+        with open("/home/chris/tmp/fullschedule.json", "r") as ifn:
+            fullsched = json.load(ifn)
+        for sched in fullsched:
+            sdc.writeChannelSchedule(sched["stationID"], sched)
+            # chanid = sched["stationID"]
+            # programs = sched["programs"]
+            # metadata = sched["metadata"]
+        # with open("/home/chris/tmp/fullschedule.json", "w") as ofn:
+        #     json.dump(fullsched, ofn, separators=(",", ":"))
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
@@ -284,7 +360,9 @@ def gRun():
         #         sdc.writeChannelToCache(ldata["channelsbyid"][chan])
         #     log.debug("lineup data write completed.")
         # cfg = channelSelector(cfg, ldata)
-        chanSchedules(cfg, sd, sdc)
+        sdb = SDDb(appname=appname)
+        chanMd5DB(cfg, sd, sdb)
+        # chanSchedules(cfg, sd, sdc, sdb)
 
         # ckwargs = {"appname": appname}
         # CFG.writeConfig(cfg, **ckwargs)
