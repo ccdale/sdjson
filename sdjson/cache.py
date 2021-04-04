@@ -22,6 +22,7 @@ from pathlib import Path
 import sys
 
 from sdjson.ccabase import Base
+from sdjson.ccabase import log
 
 # TODO test this class
 class SDCache(Base):

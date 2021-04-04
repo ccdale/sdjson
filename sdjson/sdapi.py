@@ -26,13 +26,12 @@ import json
 import sys
 import time
 
-import ccalogging
 import requests
 
 from sdjson.ccabase import Base
+from sdjson.ccabase import log
 from sdjson import __version__
 
-log = ccalogging.log
 
 # when the 20191022 api is out of beta the default url should be:
 # https://json.schedulesdirect.org/20191022

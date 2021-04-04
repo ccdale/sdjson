@@ -21,6 +21,7 @@ from pathlib import Path
 import sqlite3
 import sys
 
+from sdjson.ccabase import log
 from sdjson.cache import SDCache
 from sdjson.ccabase import Base
 
