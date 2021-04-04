@@ -81,9 +81,11 @@ class SDDb(Base):
             rows = None
             self.getConnection()
             with self.connection:
+                log.debug(f"sql: {sql} values: {values}")
                 c = self.connection.cursor()
                 c.execute(sql) if values is None else c.execute(sql, values)
                 rows = c.fetchall()
+                log.debug(f"sql result: {rows}")
             self.connection.close()
             return rows
         except Exception as e:
