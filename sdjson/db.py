@@ -17,8 +17,9 @@
 
 """Database class for the ccasdtv application."""
 
-import sqlite3
 from pathlib import Path
+import sqlite3
+import sys
 
 from sdjson.cache import SDCache
 from sdjson.ccabase import Base
