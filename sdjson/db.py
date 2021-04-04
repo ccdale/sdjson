@@ -20,14 +20,11 @@
 import sqlite3
 from pathlib import Path
 
-import ccalogging
-
 from sdjson.cache import SDCache
+from sdjson.ccabase import Base
 
-log = ccalogging.log
 
-
-class SDDb:
+class SDDb(Base):
     def __init__(self, appname="ccasdtv"):
         try:
             sc = SDCache(appname)
