@@ -131,6 +131,8 @@ def updateSchedule(cfg, sd, sdb):
                             int(prog["duration"]),
                         ],
                     )
+        else:
+            log.info("All up to date.")
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
