@@ -59,10 +59,8 @@ def insertChanMd5DB(sdb, chanid, date, cdata):
                 sql += "values (?, ?, ?, ?, ?)"
                 lmts = sdb.getTimeStamp(cdata["lastModified"])
                 dts = sdb.getTimeStamp(date, dtformat="%Y-%m-%d")
-                if sdb.insertSql(sql, [cdata["md5"], chanid, date, dts, lmts]):
-                    log.debug("new data inserted for channel md5")
-                else:
-                    log.debug("data already exists")
+                return sdb.insertSql(sql, [cdata["md5"], chanid, date, dts, lmts])
+        return False
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
@@ -74,13 +72,65 @@ def insertChanMd5DB(sdb, chanid, date, cdata):
 
 
 def chanMd5DB(cfg, sd, sdb):
+    """get the schedule md5 for each channel.
+
+    Attempt to insert into the DB, if it fails we already have this schedule
+    if it inserts ok, we don't have this schedule data - so record that in
+    the form that schedulesdirect want:
+
+            list of dictionaries
+            [
+                {
+                    "stationID": "20454",
+                    "date": ["2020-01-21", "2020-01-22"]
+                }
+            ]
+    """
     try:
+        req = []
         chanlist = [chan["stationid"] for chan in cfg["channels"]]
         schedmd5 = sd.getScheduleMd5(chanlist)
         for chan in schedmd5:
+            clist = []
             for date in schedmd5[chan]:
                 ddata = schedmd5[chan][date]
-                insertChanMd5DB(sdb, chan, date, ddata)
+                if insertChanMd5DB(sdb, chan, date, ddata):
+                    clist.append(date)
+            if len(clist) > 0:
+                req.append({"stationID": chan, "date": clist})
+        return req
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def updateSchedule(cfg, sd, sdb):
+    """Retrieve schedule data we don't currently have and insert into db.
+    https://json.schedulesdirect.org/20141201/schedules
+    """
+    try:
+        schedreq = chanMd5DB(cfg, sd, sdb)
+        if len(schedreq) > 0:
+            scheddata = sd.getSchedules(schedreq)
+            for sched in scheddata:
+                chan = sched["stationID"]
+                for prog in sched["programs"]:
+                    sql = "insert into schedule (programid, md5, stationid, airdate, duration) values (?, ?, ?, ?, ?)"
+                    sdb.insertSql(
+                        sql,
+                        [
+                            prog["programID"],
+                            prog["md5"],
+                            chan,
+                            sdb.getTimeStamp(prog["airDateTime"]),
+                            int(prog["duration"]),
+                        ],
+                    )
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
