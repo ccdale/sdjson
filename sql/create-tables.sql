@@ -1,3 +1,4 @@
+drop table if exists schedulemd5;
 create table schedulemd5 (
     md5 text,
     stationid text,
@@ -7,15 +8,17 @@ create table schedulemd5 (
     primary key(md5, stationid)
 );
 
+drop table if exists schedule;
 create table schedule (
     programid text,
     md5 text,
     stationid text,
     airdate int,
     duration int,
-    primary key(programid, stationid)
+    primary key(programid, stationid, airdate)
 );
 
+drop table if exists channel;
 create table channel (
     stationid text,
     name text,
@@ -28,6 +31,7 @@ create table channel (
     primary key(name, stationid)
 );
 
+drop table if exists program;
 create table program (
     programid text,
     md5 text,
@@ -38,6 +42,7 @@ create table program (
     primary key(programid, md5)
 );
 
+drop table if exists person;
 create table person (
     personid int,
     nameid int,
@@ -45,6 +50,7 @@ create table person (
     primary key(name, personid)
 );
 
+drop table if exists personmap;
 create table personmap (
     personid int,
     programid text,
