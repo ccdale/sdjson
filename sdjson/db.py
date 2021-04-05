@@ -105,7 +105,7 @@ class SDDb(Base):
                 log.debug(f"sql: {sql} values: {values}")
                 c = self.connection.cursor()
                 c.execute(sql, values)
-                log.debug(f"sql result: {rows}")
+                # log.debug(f"sql result: {rows}")
             self.connection.close()
             return True
         except sqlite3.IntegrityError:
