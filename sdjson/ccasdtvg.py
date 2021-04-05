@@ -30,6 +30,7 @@ from sdjson.cache import SDCache
 import sdjson.config as CFG
 from sdjson.db import SDDb
 from sdjson.lineup import parseLineupData
+from sdjson.schedule import chanMd5DB
 from sdjson.sdapi import SDApi
 from sdjson import __version__
 
@@ -230,73 +231,6 @@ def channelSelector(cfg, chandata):
 def mainWindow(cfg, sd):
     try:
         pass
-    except Exception as e:
-        exci = sys.exc_info()[2]
-        lineno = exci.tb_lineno
-        fname = exci.tb_frame.f_code.co_name
-        ename = type(e).__name__
-        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-        log.error(msg)
-        raise
-
-
-def testDictKeys(idict, keyslist, optkeyslist=None):
-    try:
-        kerror = True
-        for ikey in keyslist:
-            if ikey not in idict:
-                kerror = False
-                log.error(f"required key {ikey} not in dict {idict}")
-                break
-        if kerror and optkeyslist is not None:
-            for ikey in optkeyslist:
-                if ikey not in idict:
-                    kerror = False
-                    log.error(f"optional key {ikey} not in dict {idict}")
-                    break
-        return kerror
-    except Exception as e:
-        exci = sys.exc_info()[2]
-        lineno = exci.tb_lineno
-        fname = exci.tb_frame.f_code.co_name
-        ename = type(e).__name__
-        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-        log.error(msg)
-        raise
-
-
-def insertChanMd5DB(sdb, chanid, date, cdata):
-    try:
-        reqkeys = ["code", "lastModified", "md5", "message"]
-        if testDictKeys(cdata, reqkeys):
-            if int(cdata["code"]) == 0:
-                sql = "insert into schedulemd5 "
-                sql += "(md5, stationid, datestr, datets, modified) "
-                sql += "values (?, ?, ?, ?, ?)"
-                lmts = sdb.getTimeStamp(cdata["lastModified"])
-                dts = sdb.getTimeStamp(date, dtformat="%Y-%m-%d")
-                if sdb.insertSql(sql, [cdata["md5"], chanid, date, dts, lmts]):
-                    log.debug("new data inserted for channel md5")
-                else:
-                    log.debug("data already exists")
-    except Exception as e:
-        exci = sys.exc_info()[2]
-        lineno = exci.tb_lineno
-        fname = exci.tb_frame.f_code.co_name
-        ename = type(e).__name__
-        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-        log.error(msg)
-        raise
-
-
-def chanMd5DB(cfg, sd, sdb):
-    try:
-        chanlist = [chan["stationid"] for chan in cfg["channels"]]
-        schedmd5 = sd.getScheduleMd5(chanlist)
-        for chan in schedmd5:
-            for date in schedmd5[chan]:
-                ddata = schedmd5[chan][date]
-                insertChanMd5DB(sdb, chan, date, ddata)
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
