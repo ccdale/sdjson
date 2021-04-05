@@ -19,6 +19,10 @@
 
 import sys
 
+import ccalogging
+
+log = ccalogging.log
+
 
 def testDictKeys(idict, keyslist, optkeyslist=None):
     try:
