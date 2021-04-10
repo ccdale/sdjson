@@ -140,3 +140,24 @@ class SDDb(Base):
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
             log.error(msg)
             raise
+
+    def deleteSql(self, sql, values):
+        try:
+            self.getConnection()
+            with self.connection:
+                log.debug(f"sql: {sql} values: {values}")
+                c = self.connection.cursor()
+                c.execute(sql, values)
+            self.connection.close()
+            return True
+        except sqlite3.IntegrityError:
+            log.debug("Failed to delete row(s)")
+            return False
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            log.error(msg)
+            raise

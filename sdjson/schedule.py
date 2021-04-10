@@ -18,6 +18,7 @@
 """ccasdtv personal tv guide schedules module."""
 
 import sys
+import time
 
 import ccalogging
 
@@ -39,6 +40,29 @@ def testDictKeys(idict, keyslist, optkeyslist=None):
                     log.error(f"optional key {ikey} not in dict {idict}")
                     break
         return kerror
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def cleanChanMd5DB(sdb):
+    try:
+        seven = int(time.time()) - ((3600 * 24) * 7)
+        sql = "select * from schedulemd5 where datets < ?"
+        rows = sdb.selectSql(sql, [seven])
+        cn = len(rows)
+        msg = f"Cleaning DB, {cn} md5 rows to delete"
+        log.info(msg)
+        sql = "delete from schedulemd5 where datets < ?"
+        if sdb.deleteSql(sql, [seven]):
+            log.info("{cn} rows deleted ok.")
+        else:
+            log.warning("failed to delete {cn} rows.")
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
@@ -87,6 +111,7 @@ def chanMd5DB(cfg, sd, sdb):
             ]
     """
     try:
+        cleanChanMd5DB(sdb)
         req = []
         chanlist = [chan["stationid"] for chan in cfg["channels"]]
         schedmd5 = sd.getScheduleMd5(chanlist)
