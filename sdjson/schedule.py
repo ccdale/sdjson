@@ -149,6 +149,7 @@ def updateSchedule(cfg, sd, sdb):
     https://json.schedulesdirect.org/20141201/schedules
     """
     try:
+        requiredprograms = []
         schedreq = chanMd5DB(cfg, sd, sdb)
         if len(schedreq) > 0:
             scheddata = sd.getSchedules(schedreq)
@@ -166,8 +167,13 @@ def updateSchedule(cfg, sd, sdb):
                             int(prog["duration"]),
                         ],
                     )
+                    sql = "select * from program where programid=? and md5=?"
+                    rows = sdb.selectSql(sql, [prog["programID"], prog["md5"]])
+                    if len(rows) == 0:
+                        requiredprograms.append(prog["programID"])
         else:
             log.info("All up to date.")
+        return requiredprograms
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
