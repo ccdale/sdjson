@@ -63,6 +63,16 @@ def cleanChanMd5DB(sdb):
             log.info("{cn} rows deleted ok.")
         else:
             log.warning("failed to delete {cn} rows.")
+        sql = "select * from schedule where airdate < ?"
+        rows = sdb.selectSql(sql, [seven])
+        cn = len(rows)
+        msg = f"Cleaning DB, {cn} schedule rows to delete"
+        log.info(msg)
+        sql = "delete from schedule where airdate < ?"
+        if sdb.deleteSql(sql, [seven]):
+            log.info(f"{cn} rows deleted ok.")
+        else:
+            log.warning(f"failed to delete {cn} rows.")
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
