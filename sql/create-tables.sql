@@ -36,9 +36,12 @@ create table program (
     programid text,
     md5 text,
     title text,
+    episodetitle text,
     shortdesc text,
     longdesc text,
     originalairdate text,
+    series int,
+    episode int,
     primary key(programid, md5)
 );
 

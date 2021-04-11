@@ -182,3 +182,58 @@ def updateSchedule(cfg, sd, sdb):
         msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
         log.error(msg)
         raise
+
+
+def getPrograms(sd, sdb, proglist):
+    try:
+        cn = 0
+        xlen = 2000
+        plen = len(proglist)
+        done = False
+        while not done:
+            if (cn + xlen) > plen:
+                end = cn + plen
+                done = True
+            else:
+                end = cn + xlen
+            log.debug(f"cn: {cn}, end: {end}, plen: {plen}")
+            sublist = proglist[cn:end]
+            cn += end
+            getProgSublist(sd, sdb, sublist)
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def getProgSublist(sd, sdb, sublist):
+    try:
+        log.debug(f"Retrieving {len(sublist)} individual programs.")
+        progs = sd.getPrograms(sublist)
+        for prog in progs:
+            storeProgram(sdb, prog)
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def storeProgram(sdb, prog):
+    try:
+        pass
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
