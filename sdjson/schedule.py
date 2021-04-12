@@ -227,8 +227,111 @@ def getProgSublist(sd, sdb, sublist):
 
 
 def storeProgram(sdb, prog):
+    """Store the program in the program table.
+
+    drop table if exists program;
+    create table program (
+        programid text,
+        md5 text,
+        title text,
+        episodetitle text,
+        shortdesc text,
+        longdesc text,
+        originalairdate text,
+        series int,
+        episode int,
+        primary key(programid, md5)
+    );
+    """
     try:
-        pass
+        title = extractData(prog, "titles", "title120", True)
+        event = extractData(prog, "eventDetails", "subType")
+        desc = ""
+        if "descriptions" in prog:
+            desc = extractData(
+                prog["descriptions"], "descriptions1000", "description", True
+            )
+        originalairdate = prog.get("originalAirDate", "")
+        episodetitle = prog.get("episodeTitle150", "")
+        seriesn = episoden = 0
+        lmdata = prog.get("metadata", None)
+        if lmdata is not None and len(lmdata) > 0:
+            gn = lmdata[0].get("Gracenote", None)
+            if gn is not None:
+                seriesn = int(gn.get("season", 0))
+                episoden = int(gn.get("episode", 0))
+
+        sql = "select * from program where programid=?"
+        row = sdb.selectSql(sql, [prog["programID"]])
+        if len(row) > 0:
+            isql = "update program set"
+            aftersql = "where programid=?"
+        else:
+            isql = "insert into program set"
+            aftersql = ""
+        lfields = ",".join(
+            [
+                "programid",
+                "md5",
+                "title",
+                "episodetitle",
+                "shortdesc",
+                "originalairdate",
+                "series",
+                "episode",
+            ]
+        )
+        ldata = [
+            prog["programID"],
+            prog["md5"],
+            title,
+            episodetitle,
+            desc,
+            originalairdate,
+            seriesn,
+            episoden,
+        ]
+        if aftersql != "":
+            ldata.append(prog["programID"])
+        sql = f"{isql} ({lfields}) values (?,?,?,?,?,?,?,?) {aftersql}"
+        sdb.insertSql(sql, ldata)
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def extractData(data, key, subkey, subkeyinlist=False):
+    try:
+        ret = ""
+        default = [] if subkeyinlist else {}
+        xl = data.get(key, default)
+        if subkeyinlist:
+            for x in xl:
+                ret += x.get(subkey, "")
+        else:
+            ret += xl.get(subkey, "")
+        return ret
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def getProgramTitle(prog):
+    try:
+        xl = prog.get("titles", [])
+        for x in xl:
+            title = x.get("title120", "")
+        return title
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno

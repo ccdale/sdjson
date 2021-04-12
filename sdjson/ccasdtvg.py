@@ -39,7 +39,10 @@ home = Path.home()
 
 logfilename = home.joinpath(f".{appname}.log")
 ccalogging.setLogFile(logfilename)
-ccalogging.setDebug()
+
+# ccalogging.setDebug()
+ccallogging.setInfo()
+
 log = ccalogging.log
 
 
