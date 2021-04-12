@@ -159,7 +159,8 @@ def updateSchedule(cfg, sd, sdb):
             scheddata = sd.getSchedules(schedreq)
             for sched in scheddata:
                 chan = sched["stationID"]
-                log.info(channels[chan])
+                ddate = sched["metadata"]["startDate"]
+                log.info(f"{channels[chan]} {ddate}")
                 cn = rcn = 0
                 for prog in sched["programs"]:
                     cn += 1
