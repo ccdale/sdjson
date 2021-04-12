@@ -307,7 +307,7 @@ def insertProgram(sdb, progid, prog):
         vals = [progid]
         qvals = ["?"]
         for key in pfields:
-            klist.append(f"{key}=?")
+            klist.append(f"{key}")
             vals.append(pfields[key])
             qvals.append("?")
         kstr = ",".join(klist)
