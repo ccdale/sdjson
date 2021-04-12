@@ -124,6 +124,7 @@ def chanMd5DB(cfg, sd, sdb):
         cleanChanMd5DB(sdb)
         req = []
         chanlist = [chan["stationid"] for chan in cfg["channels"]]
+        # chanlist = channels.keys()
         schedmd5 = sd.getScheduleMd5(chanlist)
         for chan in schedmd5:
             clist = []
@@ -150,12 +151,18 @@ def updateSchedule(cfg, sd, sdb):
     """
     try:
         requiredprograms = []
+        channels = {}
+        for chan in cfg["channels"]:
+            channels[chan["stationid"]] = chan["name"]
         schedreq = chanMd5DB(cfg, sd, sdb)
         if len(schedreq) > 0:
             scheddata = sd.getSchedules(schedreq)
             for sched in scheddata:
                 chan = sched["stationID"]
+                log.info(channels[chan])
+                cn = rcn = 0
                 for prog in sched["programs"]:
+                    cn += 1
                     sql = "insert into schedule (programid, md5, stationid, airdate, duration) values (?, ?, ?, ?, ?)"
                     sdb.insertSql(
                         sql,
@@ -170,7 +177,11 @@ def updateSchedule(cfg, sd, sdb):
                     sql = "select * from program where programid=? and md5=?"
                     rows = sdb.selectSql(sql, [prog["programID"], prog["md5"]])
                     if len(rows) == 0:
+                        rcn += 1
                         requiredprograms.append(prog["programID"])
+                log.info(
+                    f"{cn} programs inserted into the schedule, need to retrieve data for {rcn}"
+                )
         else:
             log.info("All up to date.")
         return requiredprograms
