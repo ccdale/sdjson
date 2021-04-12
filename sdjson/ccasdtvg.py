@@ -30,6 +30,7 @@ from sdjson.cache import SDCache
 import sdjson.config as CFG
 from sdjson.db import SDDb
 from sdjson.lineup import parseLineupData
+from sdjson.schedule import getPrograms
 from sdjson.schedule import updateSchedule
 from sdjson.sdapi import SDApi
 from sdjson import __version__
@@ -301,7 +302,8 @@ def gRun():
         #     log.debug("lineup data write completed.")
         # cfg = channelSelector(cfg, ldata)
         sdb = SDDb(appname=appname)
-        updateSchedule(cfg, sd, sdb)
+        reqprogs = updateSchedule(cfg, sd, sdb)
+        getPrograms(sd, sdb, reqprogs)
         # chanMd5DB(cfg, sd, sdb)
         # chanSchedules(cfg, sd, sdc, sdb)
 

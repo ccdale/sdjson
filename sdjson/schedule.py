@@ -200,6 +200,7 @@ def getPrograms(sd, sdb, proglist):
         cn = 0
         xlen = 2000
         plen = len(proglist)
+        log.info(f"Need to retrieve {plen} program details.")
         done = False
         while not done:
             if (cn + xlen) > plen:
@@ -223,7 +224,7 @@ def getPrograms(sd, sdb, proglist):
 
 def getProgSublist(sd, sdb, sublist):
     try:
-        log.debug(f"Retrieving {len(sublist)} individual programs.")
+        log.info(f"Retrieving {len(sublist)} individual programs.")
         progs = sd.getPrograms(sublist)
         for prog in progs:
             storeProgram(sdb, prog)
