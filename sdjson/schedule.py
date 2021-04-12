@@ -185,6 +185,7 @@ def updateSchedule(cfg, sd, sdb):
                 )
         else:
             log.info("All up to date.")
+        log.info(f"{len(requiredprograms)} programs marked for retrieval.")
         sreq = set(requiredprograms)
         requiredprograms = list(sreq)
         log.info(
