@@ -116,7 +116,7 @@ class SDDb(Base):
             lineno = exci.tb_lineno
             fname = exci.tb_frame.f_code.co_name
             ename = type(e).__name__
-            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}: sql: {sql}, values: {values}"
             log.error(msg)
             raise
 
