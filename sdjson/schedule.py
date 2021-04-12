@@ -239,6 +239,91 @@ def getProgSublist(sd, sdb, sublist):
         raise
 
 
+def progKeyVal(prog):
+    try:
+        title = extractData(prog, "titles", "title120", True)
+        event = extractData(prog, "eventDetails", "subType")
+        desc = ""
+        if "descriptions" in prog:
+            desc = extractData(
+                prog["descriptions"], "descriptions1000", "description", True
+            )
+        originalairdate = prog.get("originalAirDate", "")
+        episodetitle = prog.get("episodeTitle150", "")
+        seriesn = episoden = 0
+        lmdata = prog.get("metadata", None)
+        if lmdata is not None and len(lmdata) > 0:
+            gn = lmdata[0].get("Gracenote", None)
+            if gn is not None:
+                seriesn = int(gn.get("season", 0))
+                episoden = int(gn.get("episode", 0))
+        pfields = {
+            "md5": prog["md5"],
+            "title": title,
+            "episodetitle": episodetitle,
+            "shortdesc": desc,
+            "originalairdate": originalairdate,
+            "series": seriesn,
+            "episode": episoden,
+        }
+        return pfields
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def updateProgram(sdb, progid, prog):
+    try:
+        pfields = progKeyVal(prog)
+        klist = []
+        vals = []
+        for key in pfields:
+            klist.append(f"{key}=?")
+            vals.append(pfields[key])
+        sql = "update program set "
+        sql += ",".join(klist)
+        sql += " where programid=?"
+        vals.append(progid)
+        sdb.insertSql(sql, vals)
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def insertProgram(sdb, progid, prog):
+    try:
+        pfields = progKeyVal(prog)
+        klist = ["programid"]
+        vals = [progid]
+        qvals = ["?"]
+        for key in pfields:
+            klist.append(f"{key}=?")
+            vals.append(pfields[key])
+            qvals.append("?")
+        kstr = ",".join(klist)
+        qvstr = ",".join(qvals)
+        sql = f"insert into program ({kstr}) values ({qvstr})"
+        sdb.insertSql(sql, vals)
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
 def storeProgram(sdb, prog):
     """Store the program in the program table.
 
@@ -257,57 +342,12 @@ def storeProgram(sdb, prog):
     );
     """
     try:
-        title = extractData(prog, "titles", "title120", True)
-        event = extractData(prog, "eventDetails", "subType")
-        desc = ""
-        if "descriptions" in prog:
-            desc = extractData(
-                prog["descriptions"], "descriptions1000", "description", True
-            )
-        originalairdate = prog.get("originalAirDate", "")
-        episodetitle = prog.get("episodeTitle150", "")
-        seriesn = episoden = 0
-        lmdata = prog.get("metadata", None)
-        if lmdata is not None and len(lmdata) > 0:
-            gn = lmdata[0].get("Gracenote", None)
-            if gn is not None:
-                seriesn = int(gn.get("season", 0))
-                episoden = int(gn.get("episode", 0))
-
         sql = "select * from program where programid=?"
         row = sdb.selectSql(sql, [prog["programID"]])
         if len(row) > 0:
-            isql = "update program set"
-            aftersql = "where programid=?"
+            updateProgram(sdb, prog["programID"], prog)
         else:
-            isql = "insert into program set"
-            aftersql = ""
-        lfields = ",".join(
-            [
-                "programid",
-                "md5",
-                "title",
-                "episodetitle",
-                "shortdesc",
-                "originalairdate",
-                "series",
-                "episode",
-            ]
-        )
-        ldata = [
-            prog["programID"],
-            prog["md5"],
-            title,
-            episodetitle,
-            desc,
-            originalairdate,
-            seriesn,
-            episoden,
-        ]
-        if aftersql != "":
-            ldata.append(prog["programID"])
-        sql = f"{isql} ({lfields}) values (?,?,?,?,?,?,?,?) {aftersql}"
-        sdb.insertSql(sql, ldata)
+            insertProgram(sdb, prog["programID"], prog)
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
