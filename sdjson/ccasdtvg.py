@@ -309,6 +309,7 @@ def gRun():
 
         # ckwargs = {"appname": appname}
         # CFG.writeConfig(cfg, **ckwargs)
+        log.info("program retrieval completed.")
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno

@@ -185,6 +185,11 @@ def updateSchedule(cfg, sd, sdb):
                 )
         else:
             log.info("All up to date.")
+        sreq = set(requiredprograms)
+        requiredprograms = list(sreq)
+        log.info(
+            f"after removing duplicates need to retrieve data for {len(requiredprograms)} programs."
+        )
         return requiredprograms
     except Exception as e:
         exci = sys.exc_info()[2]
