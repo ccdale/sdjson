@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sdjson"
-version = "0.2.14"
+version = "0.2.15"
 description = "reads schedules direct for tvlistings"
 authors = ["ccdale <chris.charles.allison+sdjson@gmail.com>"]
 license = "GPL-3.0-or-later"
