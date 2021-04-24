@@ -26,6 +26,52 @@ import ccalogging
 log = ccalogging.log
 
 
+class Configuration:
+    def __init__(self, appname="ccasdtv"):
+        try:
+            self.appname = appname
+            yamlfn = f"{self.appname}.yaml"
+            home = Path.home()
+            self.configfn = home.joinpath(".config", yamlfn)
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            log.error(msg)
+            raise
+
+    def readConfig(self):
+        try:
+            self.config = {}
+            if self.configfn.exists():
+                with open(str(self.configfn), "r") as cfn:
+                    self.config = yaml.safe_load(cfn)
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            log.error(msg)
+            raise
+
+    def writeConfig(self):
+        try:
+            if self.config.get("amdirty", True):
+                with open(str(self.configfn), "w") as cfn:
+                    yaml.dump(self.config, cfn, default_flow_style=False)
+        except Exception as e:
+            exci = sys.exc_info()[2]
+            lineno = exci.tb_lineno
+            fname = exci.tb_frame.f_code.co_name
+            ename = type(e).__name__
+            msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+            log.error(msg)
+            raise
+
+
 def writeConfig(config, appname="ccasdtv"):
     try:
         amdirty = True
