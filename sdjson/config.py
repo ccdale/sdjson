@@ -33,6 +33,7 @@ class Configuration:
             yamlfn = f"{self.appname}.yaml"
             home = Path.home()
             self.configfn = home.joinpath(".config", yamlfn)
+            self.readConfig()
         except Exception as e:
             exci = sys.exc_info()[2]
             lineno = exci.tb_lineno
