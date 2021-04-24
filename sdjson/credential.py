@@ -17,7 +17,7 @@ class Credential:
             log.error(msg)
             raise
 
-    def setPassword(password=""):
+    def setPassword(self, password=""):
         try:
             keyring.set_password(self.host, self.username, password)
         except Exception as e:
@@ -29,7 +29,7 @@ class Credential:
             log.error(msg)
             raise
 
-    def getPassword():
+    def getPassword(self):
         try:
             return keyring.get_password(self.host, self.username)
         except Exception as e:
