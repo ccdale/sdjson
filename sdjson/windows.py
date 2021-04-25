@@ -32,3 +32,19 @@ def credsWindow(username):
         msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
         log.error(msg)
         raise
+
+
+def errorWindow(emsg):
+    try:
+        layout = [[sg.T(emsg)], [sg.Cancel()]]
+        win = sg.Window("Error", layout)
+        event, values = win.read()
+        win.close()
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
