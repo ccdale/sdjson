@@ -68,7 +68,7 @@ def begin(appname="ccasdtv"):
         sd.apiOnline()
         if not sd.online:
             die(sd.statusmsg)
-        return sd
+        return (sd, CFGo)
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno

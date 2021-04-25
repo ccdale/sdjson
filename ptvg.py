@@ -18,7 +18,8 @@ log = ccalogging.log
 
 def tvg():
     try:
-        sd = begin(appname=appname)
+        sd, CFGo = begin(appname)
+        CFGo.writeConfig()
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
