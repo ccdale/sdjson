@@ -4,6 +4,8 @@ import sys
 
 import ccalogging
 
+from sdjson.db import SDDb
+from sdjson.schedule import doUpdate
 from sdjson.startup import begin
 from sdjson.startup import die
 
@@ -19,6 +21,8 @@ log = ccalogging.log
 def tvg():
     try:
         sd, CFGo = begin(appname)
+        sdb = SDDb(appname=appname)
+        doUpdate(CFGo.config, sd, sdb)
         CFGo.writeConfig()
     except Exception as e:
         exci = sys.exc_info()[2]

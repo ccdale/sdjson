@@ -233,8 +233,9 @@ def getProgSublist(sd, sdb, sublist):
     try:
         log.info(f"Retrieving {len(sublist)} individual programs.")
         progs = sd.getPrograms(sublist)
-        for prog in progs:
+        for cn, prog in enumerate(progs, start=1):
             storeProgram(sdb, prog)
+        log.info(f"retrieved {cn} individual programs.")
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
