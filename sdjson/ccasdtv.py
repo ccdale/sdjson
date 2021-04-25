@@ -71,7 +71,7 @@ def testCreds(uname, pword):
         raise
 
 
-@click.command()
+# @click.command()
 def doConfigure():
     try:
         kwargs = {"appname": appname}

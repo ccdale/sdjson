@@ -12,6 +12,7 @@ pyaml = "^20.4.0"
 click = "^7.1.2"
 ccalogging = "^0.3.3"
 PySimpleGUI = "^4.35.0"
+keyring = "^23.0.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.2"

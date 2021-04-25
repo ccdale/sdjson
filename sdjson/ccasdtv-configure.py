@@ -64,6 +64,46 @@ def checkLineup(sd, sdc, cfglineup):
         raise
 
 
+def selectFromList(xlist, blurb):
+    try:
+        print(blurb)
+        for cn, item in enumerate(xlist, start=1):
+            filler = "0" if cn < 10 else ""
+            print(f"{filler}{cn}: {item}")
+        print()
+        msg = "Select 1-10, n for next 10, x to stop: "
+        return input(msg)
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        print(msg)
+        raise
+
+
+def selectChannels(ldata):
+    try:
+        offset = 0
+        xlen = 10
+        selected = []
+        unselected = sorted([x for x in ldata["channelsbyname"]])
+        tlen = len(unselected)
+        nextten = unselected[offset:xlen]
+        msg = "Select Channels"
+        resp = selectFromList(nextten, msg)
+        print(f"{resp} was selected")
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        print(msg)
+        raise
+
+
 def configure():
     f"""Sets up the configuration for the {appname} application."""
     try:
@@ -77,10 +117,10 @@ def configure():
         sd = testCreds(
             cfg["username"], cfg["password"], cfg["token"], cfg["tokenexpires"]
         )
-        sys.exit(0)
-        cfg["amdirty"] = True
-        cfg["token"] = sd.token
-        cfg["tokenexpires"] = sd.tokenexpires
+        if cfg["token"] != sd.token:
+            cfg["amdirty"] = True
+            cfg["token"] = sd.token
+            cfg["tokenexpires"] = sd.tokenexpires
         sdc = SDCache(**ckwargs)
         sdc.setupCache()
         # check that the lineup is not out of date
@@ -90,6 +130,13 @@ def configure():
                 xlineups.append(checkLineup(sd, sdc, lineup))
                 cfg["amdirty"] = True
             cfg["lineups"] = xlineups
+        lid = cfg["lineups"][0]["lineupid"]
+        ldata = sdc.readLineupData(lid)
+        if ldata is not None:
+            selectChannels(ldata)
+            # sd.showResponse(ldata, force=True)
+        else:
+            print("ldata is None")
         CFG.writeConfig(cfg, **ckwargs)
     except Exception as e:
         exci = sys.exc_info()[2]
