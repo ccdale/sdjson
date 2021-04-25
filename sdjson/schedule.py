@@ -60,7 +60,7 @@ def cleanChanMd5DB(sdb):
         log.info(msg)
         sql = "delete from schedulemd5 where datets < ?"
         if sdb.deleteSql(sql, [seven]):
-            log.info("{cn} rows deleted ok.")
+            log.info(f"{cn} rows deleted ok.")
         else:
             log.warning("failed to delete {cn} rows.")
         sql = "select * from schedule where airdate < ?"
