@@ -44,9 +44,6 @@ class Configuration:
             log.error(msg)
             raise
 
-    def __del__(self):
-        self.writeConfig()
-
     def readConfig(self):
         try:
             if self.configfn.exists():
