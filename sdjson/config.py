@@ -72,7 +72,7 @@ class Configuration:
             fname = exci.tb_frame.f_code.co_name
             ename = type(e).__name__
             msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
-            log.error(msg)
+            print(msg)
             raise
 
     def update(self, key, value):

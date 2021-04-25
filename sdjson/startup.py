@@ -1,5 +1,4 @@
 import hashlib
-from pathlib import Path
 import sys
 
 import ccalogging
@@ -51,7 +50,7 @@ def getCreds(username):
         raise
 
 
-def begin():
+def begin(appname="ccasdtv"):
     try:
         CFGo = Configuration(appname)
         cfg = CFGo.config
@@ -69,6 +68,7 @@ def begin():
         sd.apiOnline()
         if not sd.online:
             die(sd.statusmsg)
+        return sd
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
