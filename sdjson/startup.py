@@ -67,8 +67,6 @@ def begin(appname="ccasdtv"):
         sd = SDApi(**ckwargs)
         sd.apiOnline()
         if not sd.online:
-            del cfg["token"]
-            del cfg["tokenexpires"]
             die(sd.statusmsg)
         return (sd, CFGo)
     except Exception as e:
