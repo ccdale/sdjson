@@ -53,9 +53,17 @@ def credsWindow(username):
         raise
 
 
-def getCreds():
+def getCreds(username):
     try:
-        pass
+        CREDS = Credential(username, "schedulesdirect.org")
+        hpw = CREDS.getPassword()
+        un = username
+        if hpw is None:
+            un, pw = credsWindow(username)
+            if pw is not None:
+                hpw = hashlib.sha1(pw.encode()).hexdigest()
+                CREDS.setPassword(hpw)
+        return un, hpw
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
@@ -70,10 +78,11 @@ def tvg():
     try:
         CFGo = Configuration(appname)
         cfg = CFGo.config
-        CREDS = Credential(cfg.get("username", ""), "api.schedulesdirect.org")
-        pw = CREDS.getPassword()
-        print("password is {pw}")
-
+        un, hpw = getCreds(cfg.get("username", ""))
+        log.info(f"un: {un}, pw: {hpw}")
+        if un is not None and un != cfg.get("username", ""):
+            cfg["username"] = un
+            cfg["amdirty"] = True
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
