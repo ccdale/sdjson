@@ -68,6 +68,8 @@ def begin(appname="ccasdtv"):
         sd.apiOnline()
         if not sd.online:
             die(sd.statusmsg)
+        CFGo.update("token", sd.token)
+        CFGo.update("tokenexpires", sd.tokenexpires)
         return (sd, CFGo)
     except Exception as e:
         exci = sys.exc_info()[2]
