@@ -19,9 +19,7 @@ pytest = "^6.2.2"
 Flask = "^1.1.2"
 
 [tool.poetry.scripts]
-ccasdtv = "sdjson.ccasdtv:run"
-tvconf = "sdjson.ccasdtv-configure:configure"
-ptvg = "sdjson.ccasdtvg:gRun"
+ptvg = "ptvg:doUpdateSchedule"
 jsonprint = "printjson:jprint"
 
 [build-system]

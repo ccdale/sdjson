@@ -27,6 +27,7 @@ from sdjson.startup import begin
 from sdjson.startup import die
 
 appname = "ccasdtv"
+
 home = Path.home()
 logfilename = home.joinpath(f".{appname}.log")
 ccalogging.setLogFile(logfilename)
@@ -35,7 +36,7 @@ ccalogging.setInfo()
 log = ccalogging.log
 
 
-def tvg():
+def doUpdateSchedule():
     try:
         sd, CFGo = begin(appname)
         sdb = SDDb(appname=appname)
@@ -52,4 +53,4 @@ def tvg():
 
 
 if __name__ == "__main__":
-    tvg()
+    doUpdateSchedule()
