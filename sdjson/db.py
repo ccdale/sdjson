@@ -56,7 +56,7 @@ class SDDb(Base):
 
     def doSql(self, sql, dictionary=True, one=False):
         try:
-            self.get_connection()
+            self.getConnection()
             with self.connection:
                 if dictionary:
                     self.connection.row_factory = sqlite3.Row
@@ -98,13 +98,14 @@ class SDDb(Base):
             log.error(msg)
             raise
 
-    def insertSql(self, sql, values):
+    def insertSql(self, sql, values=None):
         try:
             self.getConnection()
             with self.connection:
                 log.debug(f"sql: {sql} values: {values}")
                 c = self.connection.cursor()
-                c.execute(sql, values)
+                c.execute(sql) if values is None else c.execute(sql, values)
+                # c.execute(sql, values)
                 # log.debug(f"sql result: {rows}")
             self.connection.close()
             return True
@@ -120,14 +121,15 @@ class SDDb(Base):
             log.error(msg)
             raise
 
-    def selectSql(self, sql, values):
+    def selectSql(self, sql, values=None):
         try:
             rows = None
             self.getConnection()
             with self.connection:
                 log.debug(f"sql: {sql} values: {values}")
                 c = self.connection.cursor()
-                c.execute(sql, values)
+                c.execute(sql) if values is None else c.execute(sql, values)
+                # c.execute(sql, values)
                 rows = c.fetchall()
                 log.debug(f"sql result: {rows}")
             self.connection.close()
@@ -141,13 +143,14 @@ class SDDb(Base):
             log.error(msg)
             raise
 
-    def deleteSql(self, sql, values):
+    def deleteSql(self, sql, values=None):
         try:
             self.getConnection()
             with self.connection:
                 log.debug(f"sql: {sql} values: {values}")
                 c = self.connection.cursor()
-                c.execute(sql, values)
+                c.execute(sql) if values is None else c.execute(sql, values)
+                # c.execute(sql, values)
             self.connection.close()
             return True
         except sqlite3.IntegrityError:
