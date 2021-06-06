@@ -5,8 +5,23 @@ import time
 import ccalogging
 
 from sdjson.programs import channelPrograms
+from sdjson.timedisplay import hms
 
 log = ccalogging.log
+
+style = """
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {background-color: #f2f2f2;}
+"""
 
 
 def makeTag(tag, data, attrs=None, close=True):
@@ -69,7 +84,9 @@ def makeP(data):
 
 def makePage(body, head=None):
     try:
-        hd = makeTag("head", head) if head is not None else makeTag("head", "")
+        global style
+        css = makeTag("style", style)
+        hd = makeTag("head", head) if head is not None else makeTag("head", css)
         bd = makeTag("body", body)
         return makeTag("html", hd + bd)
     except Exception as e:
@@ -121,7 +138,10 @@ def progLine(prog):
         hr = tt.hour
         xmin = tt.minute
         stt = makeTag("td", f"{hr:02}:{xmin:02}")
-        mdur = makeTag("td", f'{int(prog["duration"] / 60):5} minutes  ')
+        mdur = makeTag(
+            "td",
+            f'{hms(int(prog["duration"]), small=False, colons=True, noseconds=True)}',
+        )
         tit = makeTag("td", prog["title"])
         row = makeTag("tr", stt + mdur + tit)
         return row

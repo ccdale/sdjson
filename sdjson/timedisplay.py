@@ -1,5 +1,9 @@
 import sys
 
+import ccalogging
+
+log = ccalogging.log
+
 
 def addToString(xstr, xadd):
     """Appends the string `xadd` to the string `xstr`.
@@ -32,8 +36,13 @@ def addToString(xstr, xadd):
             raise TypeError("Input format error. xadd is neither list nor string")
         return op
     except Exception as e:
-        fname = sys._getframe().f_code.co_name
-        errorRaise(fname, e)
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
 
 
 def padStr(xstr, xlen=2, pad=" ", padleft=True):
@@ -57,8 +66,13 @@ def padStr(xstr, xlen=2, pad=" ", padleft=True):
                 zstr += pad
         return zstr
     except Exception as e:
-        fname = sys._getframe().f_code.co_name
-        errorRaise(fname, e)
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
 
 
 def decomplexifyhms(tim, index, labels, labindex, oplen, colons=False):
@@ -97,8 +111,13 @@ def decomplexifyhms(tim, index, labels, labindex, oplen, colons=False):
         op.append(sval)
         return op
     except Exception as e:
-        fname = sys._getframe().f_code.co_name
-        errorRaise(fname, e)
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
 
 
 def reduceTime(unit, secs):
@@ -125,11 +144,54 @@ def reduceTime(unit, secs):
             )
         return (units, rem)
     except Exception as e:
-        fname = sys._getframe().f_code.co_name
-        errorRaise(fname, e)
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
 
 
-def hms(secs, small=True, short=True, single=False, colons=False):
+def displayValue(val, label, zero=True):
+    """Pluralises the label.
+    if zero is True val == 0 then the empty string is returned.
+    Args:
+        val: number
+        label: str
+        zero: Bool
+    Raises:
+        TypeError: Exception if val is not numeric
+    Returns:
+        str:
+    """
+    try:
+        if zero and val == 0:
+            return ""
+        dlabel = label if val == 1 else label + "s"
+        sval = str(val)
+        if not sval.isnumeric():
+            raise TypeError("input is not numeric")
+        return addToString(sval, [" ", dlabel])
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def hms(
+    secs,
+    small=True,
+    short=True,
+    single=False,
+    colons=False,
+    nodays=True,
+    noseconds=False,
+):
     """Convert `secs` to days, hours, minutes and seconds.
 
     if `small` is True then only return the higher values
@@ -171,7 +233,9 @@ def hms(secs, small=True, short=True, single=False, colons=False):
             cnlabs = 2
         else:
             cnlabs = 1 if short else 0
-        for cn in range(4):
+        start = 0 if not nodays else 1
+        end = 4 if not noseconds else 3
+        for cn in range(start, end):
             if not started and tim[cn] > 0:
                 started = True
             if started:
@@ -179,5 +243,10 @@ def hms(secs, small=True, short=True, single=False, colons=False):
         msg = addToString("", op)
         return msg
     except Exception as e:
-        fname = sys._getframe().f_code.co_name
-        errorRaise(fname, e)
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise

@@ -61,6 +61,7 @@ class Configuration:
     def writeConfig(self):
         try:
             if self.config.get("amdirty", True):
+                self.config.pop("amdirty", None)
                 with open(str(self.configfn), "w") as cfn:
                     yaml.dump(self.config, cfn, default_flow_style=False)
         except Exception as e:
