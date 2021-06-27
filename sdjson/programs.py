@@ -7,9 +7,15 @@ import ccalogging
 log = ccalogging.log
 
 
-def gridProgs(startoffset=0):
+def gridProgs(sdb, channels, startoffset=0):
     try:
-        sql = "select * from schedule where airdate>=? and airdate<=? order by stationid, airdate asc"
+        pdict = {}
+        now = int(time.time())
+        start = now + startoffset
+        end = start + 7200
+        for chan in channels:
+            pdict[chan["name"]] = channelPrograms(sdb, chan["stationid"], start, end)
+        return pdict
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
