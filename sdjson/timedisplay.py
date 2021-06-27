@@ -1,4 +1,6 @@
+import datetime
 import sys
+import time
 
 import ccalogging
 
@@ -242,6 +244,36 @@ def hms(
                 op += decomplexifyhms(tim, cn, labs, cnlabs, len(op), colons)
         msg = addToString("", op)
         return msg
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def roundTime(roundto="h"):
+    """
+    Round the current time to the last time unit
+
+    time units:
+        "h" - hour
+        "d" - day - returns midnight (today)
+
+    returns a timestamp
+    """
+    try:
+        if roundto == "d":
+            today = datetime.date.today()
+            midnight = int(time.mktime(today.timetuple()))
+            return midnight
+        elif roundto == "h":
+            today = datetime.datetime.today()
+            then = datetime.datetime(today.year, today.month, today.day, today.hour)
+            tsthen = int(time.mktime(then.timetuple()))
+            return tsthen
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
