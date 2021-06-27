@@ -7,12 +7,15 @@ import ccalogging
 log = ccalogging.log
 
 
-def gridProgs(sdb, channels, startoffset=0):
+def gridProgs(sdb, channels, startoffset=0, length=2):
+    """
+    Return a dictionary of programs for all channels over a `length` period of hours
+    """
     try:
         pdict = {}
         now = int(time.time())
         start = now + startoffset
-        end = start + 7200
+        end = start + (3600 * length)
         for chan in channels:
             pdict[chan["name"]] = channelPrograms(sdb, chan["stationid"], start, end)
         return pdict
