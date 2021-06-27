@@ -4,7 +4,7 @@ import time
 
 import ccalogging
 
-from sdjson.programs import channelPrograms
+from sdjson.programs import dayProgs
 from sdjson.timedisplay import hms
 
 log = ccalogging.log
@@ -162,7 +162,7 @@ def channelPage(sdb, cfg, channelid, offset=0):
         # name = rows[0][0]
         name = channelName(cfg, channelid)
         heading = makeDiv(makeTag("h3", name))
-        progs = channelPrograms(sdb, channelid, offset)
+        progs = dayProgs(sdb, channelid, offset)
         trows = []
         ccalogging.setDebug()
         for prog in progs:

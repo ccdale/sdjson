@@ -7,15 +7,41 @@ import ccalogging
 log = ccalogging.log
 
 
-def channelPrograms(sdb, channelid, dayoffset=0):
+def gridProgs(startoffset=0):
     try:
-        progs = []
+        sql = "select * from schedule where airdate>=? and airdate<=? order by stationid, airdate asc"
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def dayProgs(sdb, channelid, dayoffset=0):
+    try:
         days = dayoffset * 86400
         today = datetime.date.today()
         midnight = int(time.mktime(today.timetuple())) + days
         tomorrow = midnight + 86400
+        return channelPrograms(sdb, channelid, midnight, tomorrow)
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def channelPrograms(sdb, channelid, start, end):
+    try:
+        progs = []
         sql = "select * from schedule where stationid=? and airdate>=? and airdate<=? order by airdate asc"
-        rows = sdb.selectSql(sql, [channelid, midnight, tomorrow])
+        rows = sdb.selectSql(sql, [channelid, start, end])
         # make a list of program ids and remove duplicates
         pids = set([row[0] for row in rows])
         iprogs = getProgramsFromList(sdb, pids)
