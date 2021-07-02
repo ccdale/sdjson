@@ -8,8 +8,9 @@ from flask import request
 
 from sdjson.config import Configuration
 from sdjson.db import SDDb
-from sdjson.html import frontPage
 from sdjson.html import channelPage
+from sdjson.html import frontPage
+from sdjson.html import gridPage
 from sdjson.startup import begin
 from sdjson import __version__
 
@@ -54,6 +55,25 @@ def channel(channelid):
         except ValueError:
             offset = 0
         return channelPage(sdb, cfg, channelid, offset)
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+@app.route("/grid")
+def grid():
+    try:
+        CFGo = Configuration(appname)
+        cfg = CFGo.config
+        sdb = SDDb(appname=appname)
+        gp = gridPage(sdb, cfg, 0)
+        # print(gp)
+        return gp
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno

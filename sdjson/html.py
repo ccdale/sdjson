@@ -5,6 +5,7 @@ import time
 import ccalogging
 
 from sdjson.programs import dayProgs
+from sdjson.programs import gridProgs
 from sdjson.timedisplay import hms
 
 log = ccalogging.log
@@ -24,14 +25,17 @@ tr:nth-child(even) {background-color: #f2f2f2;}
 """
 
 
-def makeTag(tag, data, attrs=None, close=True):
+def makeTag(tag, data, attrs=None, close=True, datanl=False, endnl=False, indent=""):
     try:
         op = f"<{tag}"
         cl = f"</{tag}>" if close else ""
+        dnl = "\n" if datanl else ""
+        ednl = "\n" if datanl and data[-1] != "\n" else ""
+        enl = "\n" if endnl else ""
         if attrs is not None:
             for attr in attrs:
                 op += f" {attr}"
-        return f"{op}>{data}{cl}"
+        return f"{indent}{op}>{dnl}{data}{ednl}{cl}{enl}"
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
@@ -42,10 +46,10 @@ def makeTag(tag, data, attrs=None, close=True):
         raise
 
 
-def makeLink(route, linktxt):
+def makeLink(route, linktxt, endnl=False, datanl=False, indent=""):
     try:
         attrs = [f"href={route}"]
-        return makeTag("a", linktxt, attrs)
+        return makeTag("a", linktxt, attrs, endnl=endnl, datanl=datanl, indent=indent)
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
@@ -56,9 +60,9 @@ def makeLink(route, linktxt):
         raise
 
 
-def makeDiv(data):
+def makeDiv(data, endnl=False, datanl=False, indent=""):
     try:
-        return makeTag("div", data)
+        return makeTag("div", data, endnl=endnl, datanl=datanl, indent=indent)
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
@@ -69,9 +73,9 @@ def makeDiv(data):
         raise
 
 
-def makeP(data):
+def makeP(data, indent="", endnl=False, datanl=False):
     try:
-        return makeTag("p", data)
+        return makeTag("p", data, indent=indent, endnl=endnl, datanl=datanl)
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
@@ -85,10 +89,16 @@ def makeP(data):
 def makePage(body, head=None):
     try:
         global style
-        css = makeTag("style", style)
-        hd = makeTag("head", head) if head is not None else makeTag("head", css)
-        bd = makeTag("body", body)
-        return makeTag("html", hd + bd)
+        indent = "  "
+        css = makeTag("style", style, endnl=True, indent=indent + indent)
+        hd = (
+            makeTag("head", head, datanl=True, endnl=True, indent=indent)
+            if head is not None
+            else makeTag("head", css, datanl=True, endnl=True, indent=indent)
+        )
+        bd = makeTag("body", body, endnl=True, datanl=True, indent=indent)
+        page = makeTag("html", hd + bd, datanl=True)
+        return "<!DOCTYPE html>\n" + page
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
@@ -132,7 +142,7 @@ def channelName(cfg, stationid):
         raise
 
 
-def progLine(prog):
+def progLine(prog, indent=""):
     try:
         tt = datetime.datetime.fromtimestamp(prog["airdate"])
         hr = tt.hour
@@ -143,7 +153,7 @@ def progLine(prog):
             f'{hms(int(prog["duration"]), small=False, colons=True, noseconds=True)}',
         )
         tit = makeTag("td", prog["title"])
-        row = makeTag("tr", stt + mdur + tit)
+        row = makeTag("tr", stt + mdur + tit, datanl=True, endnl=True, indent=indent)
         return row
     except Exception as e:
         exci = sys.exc_info()[2]
@@ -160,19 +170,43 @@ def channelPage(sdb, cfg, channelid, offset=0):
         # sql = "select name from channel where stationid=?"
         # rows = sdb.selectSql(sql, [channelid])
         # name = rows[0][0]
+        indent = "  "
         name = channelName(cfg, channelid)
-        heading = makeDiv(makeTag("h3", name))
-        progs = dayProgs(sdb, channelid, offset)
+        heading = makeDiv(makeTag("h3", name, endnl=True, indent=indent))
+        progs = dayProgs(sdb, channelid, offset, indent=indent + indent + indent)
         trows = []
         ccalogging.setDebug()
         for prog in progs:
             trows.append(progLine(prog))
         ccalogging.setInfo()
-        rows = "\n".join(trows)
-        table = makeTag("table", rows)
-        dtable = makeDiv(table)
+        rows = "".join(trows)
+        table = makeTag("table", rows, indent=indent + indent)
+        dtable = makeDiv(table, indent=indent)
         body = heading + dtable
         return makePage(body)
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def gridPage(sdb, cfg, offset=0):
+    try:
+        pdict = gridProgs(sdb, cfg["channels"], startoffset=offset)
+        trows = []
+        for channame in pdict:
+            row = makeTag("td", channame, endnl=True)
+            for prog in pdict[channame]:
+                row += makeTag("td", prog["title"], endnl=True)
+            trows.append(makeTag("tr", row, endnl=True, datanl=True))
+        rows = "".join(trows)
+        tab = makeTag("table", rows, datanl=True, endnl=True)
+        dtable = makeDiv(tab, datanl=True, endnl=True)
+        return makePage(dtable)
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno

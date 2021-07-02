@@ -13,6 +13,7 @@ def gridProgs(sdb, channels, startoffset=0, length=2):
     """
     try:
         pdict = {}
+        # dnow = datetime.datetime()
         now = int(time.time())
         start = now + startoffset
         end = start + (3600 * length)
