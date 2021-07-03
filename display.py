@@ -71,7 +71,8 @@ def grid():
         CFGo = Configuration(appname)
         cfg = CFGo.config
         sdb = SDDb(appname=appname)
-        gp = gridPage(sdb, cfg, 0)
+        offset = request.args.get("offset")
+        gp = gridPage(sdb, cfg, offset)
         # print(gp)
         return gp
     except Exception as e:
