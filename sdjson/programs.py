@@ -91,10 +91,10 @@ def gridPrograms(sdb, start, end):
             for key in pcols:
                 prog[key] = row[pcols[key]]
             for key in ipcols:
-                prog[key] = iprogs[prog["progamid"]][ipcols[key]]
+                prog[key] = iprogs[prog["programid"]][ipcols[key]]
             if prog["stationid"] not in progs:
-                progs[prog["stationida"]] = []
-            progs[prog["stationida"]].append(prog)
+                progs[prog["stationid"]] = []
+            progs[prog["stationid"]].append(prog)
             if shortest > prog["duration"]:
                 shortest = prog["duration"]
         return (progs, shortest)
