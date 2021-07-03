@@ -224,7 +224,7 @@ def timeLine(start, numcolumns=1, width=4):
             if first:
                 first = False
                 arrow = makeTag(
-                    "span", makeTag(f"/grid?offset={start-(3600*width)}", " < ")
+                    "span", makeLink(f"/grid?offset={start-(3600*width)}", " < ")
                 )
                 stime = arrow + stime
             if width - 1 == i:
@@ -232,7 +232,7 @@ def timeLine(start, numcolumns=1, width=4):
             if last:
                 last = False
                 arrow = makeTag(
-                    "span", makeTag(f"/grid?offset={start+(3600*width)}", " > ")
+                    "span", makeLink(f"/grid?offset={start+(3600*width)}", " > ")
                 )
                 stime = stime + arrow
             row += makeTag("td", stime, attrs=attrs, endnl=True)
