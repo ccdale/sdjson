@@ -33,8 +33,14 @@ def makeTag(tag, data, attrs=None, close=True, datanl=False, endnl=False, indent
         ednl = "\n" if datanl and data[-1] != "\n" else ""
         enl = "\n" if endnl else ""
         if attrs is not None:
-            for attr in attrs:
-                op += f" {attr}"
+            if type(attrs) is dict:
+                for key in attrs:
+                    op += f' {key}="{attrs[key]}"'
+            elif type(attrs) is list:
+                for attr in attrs:
+                    op += f" {attr}"
+            else:
+                op += f" {attrs}"
         return f"{indent}{op}>{dnl}{data}{ednl}{cl}{enl}"
     except Exception as e:
         exci = sys.exc_info()[2]
@@ -194,10 +200,42 @@ def channelPage(sdb, cfg, channelid, offset=0):
         raise
 
 
+def timeLine(start, numcolumns=1, width=4):
+    """returns a table row of the date and half hour increments.
+
+    start: the timestamp of the start time
+    numcolumns: the number of table cols per half hour
+    width: the number of half hours to show
+    """
+    try:
+        dt = datetime.datetime.fromtimestamp(start)
+        sdate = f"{dt.strftime('%a')} {dt.day:02}/{dt.month:02}"
+        dt.weekday
+        attrs = {"colspan": numcolumns, "class": "timerowdata"}
+        row = makeTag("td", sdate, attrs=attrs, endnl=True)
+        for i in range(width):
+            dt = datetime.datetime.fromtimestamp(start)
+            stime = f"{dt.hour:02}:{dt.minute:02}"
+            row += makeTag("td", stime, attrs=attrs, endnl=True)
+            start = start + 1800
+        attrs = {"class": "timerow"}
+        trow = makeTag("tr", row, attrs=attrs, endnl=True, datanl=True)
+        return trow
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
 def gridPage(sdb, cfg, offset=0):
     try:
-        pdict = gridProgs(sdb, cfg["channels"], startoffset=offset)
-        trows = []
+        pdict, shortest, start = gridProgs(sdb, cfg["channels"], startoffset=offset)
+        tl = timeLine(start, numcolumns=1, width=4)
+        trows = [tl]
         for channame in pdict:
             row = makeTag("td", channame, endnl=True)
             for prog in pdict[channame]:

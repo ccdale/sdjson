@@ -254,9 +254,11 @@ def hms(
         raise
 
 
-def roundTime(roundto="h"):
+def roundTime(ts=None, roundto="h"):
     """
     Round the current time to the last time unit
+    or
+    Round the supplied timestamp (ts) to the last time unit
 
     time units:
         "h" - hour
@@ -265,13 +267,17 @@ def roundTime(roundto="h"):
     returns a timestamp
     """
     try:
+        if ts is None:
+            ts = int(time.time())
         if roundto == "d":
-            today = datetime.date.today()
-            midnight = int(time.mktime(today.timetuple()))
+            dt = datetime.datetime.fromtimestamp(ts)
+            # today = datetime.date.today()
+            midnight = int(time.mktime(dt.timetuple()))
             return midnight
         elif roundto == "h":
-            today = datetime.datetime.today()
-            then = datetime.datetime(today.year, today.month, today.day, today.hour)
+            dt = datetime.datetime.fromtimestamp(ts)
+            # today = datetime.datetime.today()
+            then = datetime.datetime(dt.year, dt.month, dt.day, dt.hour)
             tsthen = int(time.mktime(then.timetuple()))
             return tsthen
     except Exception as e:
