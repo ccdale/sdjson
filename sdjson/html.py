@@ -264,6 +264,7 @@ def frontPage(cfg):
             route = f"""/channel/{chan["stationid"]}"""
             lnktxt = chan["name"]
             op += makeP(makeLink(route, lnktxt))
+        op += makeDiv(makeLink("/grid", "Grid"), endnl=True, datanl=True)
         body = heading + makeDiv(op)
         return makePage(body)
     except Exception as e:
