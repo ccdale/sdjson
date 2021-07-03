@@ -210,13 +210,31 @@ def timeLine(start, numcolumns=1, width=4):
     """
     try:
         dt = datetime.datetime.fromtimestamp(start)
-        sdate = f"{dt.strftime('%a')} {dt.day:02}/{dt.month:02}"
-        dt.weekday
+        sdate = makeTag("span", f"{dt.strftime('%a')} {dt.day:02}/{dt.month:02}")
+        yesterday = makeTag("span", makeLink(f"/grid?offset={start-86400}", " << "))
+        tomorrow = makeTag("span", makeLink(f"/grid?offset={start+86400}", " >> "))
+        today = yesterday + sdate + tomorrow
         attrs = {"colspan": numcolumns, "class": "timerowdata"}
-        row = makeTag("td", sdate, attrs=attrs, endnl=True)
+        row = makeTag("td", today, attrs=attrs, endnl=True)
+        first = True
+        last = False
         for i in range(width):
             dt = datetime.datetime.fromtimestamp(start)
-            stime = f"{dt.hour:02}:{dt.minute:02}"
+            stime = makeTag("span", f"{dt.hour:02}:{dt.minute:02}")
+            if first:
+                first = False
+                arrow = makeTag(
+                    "span", makeTag(f"/grid?offset={start-(3600*width)}", " < ")
+                )
+                stime = arrow + stime
+            if width - 1 == i:
+                last = True
+            if last:
+                last = False
+                arrow = makeTag(
+                    "span", makeTag(f"/grid?offset={start+(3600*width)}", " > ")
+                )
+                stime = stime + arrow
             row += makeTag("td", stime, attrs=attrs, endnl=True)
             start = start + 1800
         attrs = {"class": "timerow"}
