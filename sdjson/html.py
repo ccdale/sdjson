@@ -245,7 +245,8 @@ def gridPage(sdb, cfg, offset=0):
         rows = "".join(trows)
         tab = makeTag("table", rows, datanl=True, endnl=True)
         dtable = makeDiv(tab, datanl=True, endnl=True)
-        return makePage(dtable)
+        home = makeDiv(makeLink("/", "Home"))
+        return makePage(dtable + home)
     except Exception as e:
         exci = sys.exc_info()[2]
         lineno = exci.tb_lineno
