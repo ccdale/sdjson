@@ -178,7 +178,8 @@ def channelPage(sdb, cfg, channelid, offset=0):
         # name = rows[0][0]
         indent = "  "
         name = channelName(cfg, channelid)
-        heading = makeDiv(makeTag("h3", name, endnl=True, indent=indent))
+        nlink = makeLink("/", name)
+        heading = makeDiv(makeTag("h3", nlink, endnl=True, indent=indent))
         progs = dayProgs(sdb, channelid, offset)
         trows = []
         ccalogging.setDebug()
