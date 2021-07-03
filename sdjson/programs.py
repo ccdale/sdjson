@@ -40,7 +40,7 @@ def gridProgs(sdb, channels, startoffset=0, length=2):
         for chanid in gprogs:
             chan = findChannel(channels, chanid)
             if chan is not None:
-                pdict[chan["name"]] = gprogs[chan]
+                pdict[chan["name"]] = gprogs[chanid]
         return (pdict, shortest, start)
         # shortest = 9999999
         # for chan in channels:
