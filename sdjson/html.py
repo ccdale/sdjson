@@ -35,7 +35,7 @@ def makeTag(tag, data, attrs=None, close=True, datanl=False, endnl=False, indent
         if attrs is not None:
             if type(attrs) is dict:
                 for key in attrs:
-                    op += f' {key}="{attrs[key]}"'
+                    op += f" {key}={attrs[key]}"
             elif type(attrs) is list:
                 for attr in attrs:
                     op += f" {attr}"
@@ -201,7 +201,20 @@ def channelPage(sdb, cfg, channelid, offset=0):
         raise
 
 
-def timeLine(start, numcolumns=1, width=4):
+def makeColspan(tablestart, tablelength, progstart, progdur, minwidth):
+    try:
+        pass
+    except Exception as e:
+        exci = sys.exc_info()[2]
+        lineno = exci.tb_lineno
+        fname = exci.tb_frame.f_code.co_name
+        ename = type(e).__name__
+        msg = f"{ename} Exception at line {lineno} in function {fname}: {e}"
+        log.error(msg)
+        raise
+
+
+def timeLine(start, offset=0, numcolumns=1, width=4):
     """returns a table row of the date and half hour increments.
 
     start: the timestamp of the start time
@@ -210,11 +223,13 @@ def timeLine(start, numcolumns=1, width=4):
     """
     try:
         dt = datetime.datetime.fromtimestamp(start)
-        sdate = makeTag("span", f"{dt.strftime('%a')} {dt.day:02}/{dt.month:02}")
-        yesterday = makeTag("span", makeLink(f"/grid?offset={start-86400}", " << "))
-        tomorrow = makeTag("span", makeLink(f"/grid?offset={start+86400}", " >> "))
+        sdate = makeTag(
+            "span", f"{dt.strftime('%a')} {dt.day:02}/{dt.month:02}/{dt.year}"
+        )
+        yesterday = makeTag("span", makeLink(f"/grid?offset={offset-86400}", " << "))
+        tomorrow = makeTag("span", makeLink(f"/grid?offset={offset+86400}", " >> "))
         today = yesterday + sdate + tomorrow
-        attrs = {"colspan": numcolumns, "class": "timerowdata"}
+        attrs = {"colspan": numcolumns, "class": "'timerowdata'"}
         row = makeTag("td", today, attrs=attrs, endnl=True)
         first = True
         last = False
@@ -224,7 +239,7 @@ def timeLine(start, numcolumns=1, width=4):
             if first:
                 first = False
                 arrow = makeTag(
-                    "span", makeLink(f"/grid?offset={start-(3600*width)}", " < ")
+                    "span", makeLink(f"/grid?offset={offset-(1800*width)}", " < ")
                 )
                 stime = arrow + stime
             if width - 1 == i:
@@ -232,12 +247,12 @@ def timeLine(start, numcolumns=1, width=4):
             if last:
                 last = False
                 arrow = makeTag(
-                    "span", makeLink(f"/grid?offset={start+(3600*width)}", " > ")
+                    "span", makeLink(f"/grid?offset={offset+(1800*width)}", " > ")
                 )
                 stime = stime + arrow
             row += makeTag("td", stime, attrs=attrs, endnl=True)
             start = start + 1800
-        attrs = {"class": "timerow"}
+        attrs = {"class": "'timerow'"}
         trow = makeTag("tr", row, attrs=attrs, endnl=True, datanl=True)
         return trow
     except Exception as e:
@@ -253,7 +268,7 @@ def timeLine(start, numcolumns=1, width=4):
 def gridPage(sdb, cfg, offset=0):
     try:
         pdict, shortest, start = gridProgs(sdb, cfg["channels"], startoffset=offset)
-        tl = timeLine(start, numcolumns=1, width=4)
+        tl = timeLine(start, offset=offset, numcolumns=1, width=4)
         trows = [tl]
         for channame in pdict:
             row = makeTag("td", channame, endnl=True)
